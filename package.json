@@ -1,0 +1,37 @@
+{
+  "name": "be-pilllomart",
+  "version": "1.0.0",
+  "description": "be-pilllomart",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.13.7",
+    "multer": "^1.4.3"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "eslint": "^7.32.0",
+    "jest": "^27.0.6",
+    "nodemon": "^2.0.12",
+    "supertest": "^6.1.5"
+  },
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vtrungpd3/BE-PillloMart.git"
+  },
+  "author": "trungpham71198",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vtrungpd3/BE-PillloMart/issues"
+  },
+  "homepage": "https://github.com/vtrungpd3/BE-PillloMart#readme"
+}
