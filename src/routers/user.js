@@ -1,4 +1,4 @@
-// === Route note ===
+// === Route User ===
 const express = require('express');
 const router = express.Router();
 
@@ -7,12 +7,12 @@ const {
     getById,
     deleteById,
     updateById,
-    createProduct
-} = require('../controllers/product');
+    createUser
+} = require('../controllers/user');
 
 /**
- * @route GET api/note
- * @description get all note
+ * @route GET api/User
+ * @description get all User
  * @access public
  */
 
@@ -20,8 +20,8 @@ router.post('/', getAll);
 
 
 /**
- * @route GET api/note/:id
- * @description get by id note
+ * @route GET api/User/:id
+ * @description get by id User
  * @access public
  */
 
@@ -29,24 +29,24 @@ router.get('/:id', getById);
 
 
 /**
- * @route POST/api/note
- * @description add a new note
+ * @route POST/api/User
+ * @description add a new User
  * @access public
  */
 
-router.post('/', createProduct);
+router.post('/', createUser);
 
 /**
- * @route PUT api/note/:id
- * @description update note
+ * @route PUT api/User/:id
+ * @description update User
  * @access public
  */
 
 router.put('/:id', updateById);
 
 /**
-  * @route DELETE api/note/:id
-  * @description delete note
+  * @route DELETE api/User/:id
+  * @description delete User
   * @access public
   */
 

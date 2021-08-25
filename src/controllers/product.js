@@ -2,23 +2,27 @@ const Product = require('../models/product');
 
 const getAll = async (req, res) => {
     try {
-        let search = [];
-        const { name, category, type } = req.body;
+        let search = {};
+        const { name, category, type, pageInfo } = req.body;
+        const { pageIndex = 1 } = pageInfo || {};
 
         if (name) {
-            search.push({name: new RegExp(name, 'gim')});
+            search.name = new RegExp(name, 'gim');
         }
 
         if (category) {
-            search.push({category});
+            search.category = category;
         }
 
         if (type) {
-            search.push({type});
+            search.type = type;
         }
+            
+        const products = await Product.find({ $or: [search] }).limit(10 * pageIndex).lean();
+        const total = await Product.findOne({ _id: { $gt: products[products.length - 1]._id } }).select("_id").lean();
+        const hasNextPage = total ? true : false;
 
-        const products = await Product.find({ $or: search }).lean();
-        res.json({ result: products });
+        res.json({ result: products, pageInfo: { hasNextPage, pageIndex }});
     } catch (exception) {
         res.status(500).json({ error: exception });
     }
@@ -39,14 +43,13 @@ const getById = async (req, res) => {
 
 const createProduct = async (req, res) => {
     try {
-        const { name, price, category, type } = req.body;
-
+        const { name, price, category, type, avatar } = req.body;
         const data = new Product({
             name,
             price,
             category,
             type,
-            avatar: req.file.path 
+            avatar
         });
 
         const resProduct = await data.save();
@@ -72,14 +75,16 @@ const deleteById = async (req, res) => {
 
 const updateById = async (req, res) => {
     try {
-        const { content, important } = req.body || {};
+        const { name, price, category, type, avatar } = req.body;
+        const data = new Product({
+            name,
+            price,
+            category,
+            type,
+            avatar
+        });
 
-        const note = {
-            content,
-            important
-        };
-
-        const updateProduct = await Product.findByIdAndUpdate(req.params.id, note, { new: true });
+        const updateProduct = await Product.findByIdAndUpdate(req.params.id, data, { new: true });
         res.json(updateProduct);
     } catch (exception) {
         res.status(500).json({ error: exception });
