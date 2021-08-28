@@ -16,7 +16,7 @@ const {
  * @access public
  */
 
-router.post('/', getAll);
+router.post('/s', getAll);
 
 
 /**

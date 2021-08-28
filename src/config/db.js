@@ -3,7 +3,7 @@ const { MONGODB } = require('../utils/config');
 
 const ConnectDB = async () => {
     try {
-        await mongoose.connect(MONGODB, { useNewUrlParser: true, useUnifiedTopology: true });
+        await mongoose.connect(MONGODB, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
         console.log('MongoDB is connected');
     } catch (err) {
         console.error(err.message);

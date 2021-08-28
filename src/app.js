@@ -15,6 +15,7 @@ app.get('/', (req, res) => res.send('Server up and running'));
 
 ConnectDB();
 
+app.use(morgan('dev'));
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));

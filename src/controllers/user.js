@@ -1,4 +1,6 @@
 const User = require('../models/user');
+const argon2 = require('argon2');
+const { validatePassword } = require('../Constants/enum')
 
 const getAll = async (req, res) => {
     try {
@@ -14,8 +16,12 @@ const getAll = async (req, res) => {
         }
 
         const users = await User.find({ $or: [search] }).lean();
+        const data = users.map((user) => {
+            delete user.password;
+            return user
+        })
 
-        res.json({ result: users });
+        res.json({ result: data });
     } catch (exception) {
         res.status(500).json({ error: exception });
     }
@@ -36,15 +42,23 @@ const getById = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
-        console.log('req.body', req.body);
         const { name, email, password } = req.body;
+        if (!validatePassword(password)) {
+            return res.status(404).json({ error: "Password not valid"})
+        }
+
+        const hash = await argon2.hash(password);
         const data = {
             name,
             email,
-            password,
+            password: hash,
         };
+        
         const resUser = await User.create(data);
-        res.json({result: resUser});
+        const objNew = resUser.toJSON();
+        delete objNew.password;
+
+        res.json({result: objNew});
     } catch (exception) {
         res.status(500).json({ error: exception });
     }
@@ -85,5 +99,5 @@ module.exports = {
     getById,
     deleteById,
     updateById,
-    createUser
+    createUser,
 };
