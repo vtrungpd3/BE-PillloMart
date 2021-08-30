@@ -17,7 +17,7 @@ const getAll = async (req, res) => {
         if (type) {
             search.type = type;
         }
-            
+        
         const products = await Product.find({ $or: [search] }).limit(10 * pageIndex).lean();
         const total = await Product.findOne({ _id: { $gt: products[products.length - 1]._id } }).select("_id").lean();
         const hasNextPage = total ? true : false;
@@ -44,15 +44,16 @@ const getById = async (req, res) => {
 const createProduct = async (req, res) => {
     try {
         const { name, price, category, type, avatar } = req.body;
-        const data = new Product({
+        const data = {
             name,
             price,
             category,
             type,
             avatar
-        });
+        };
 
-        const resProduct = await data.save();
+        const resProduct = await Product.create(data);
+
         res.json({result: resProduct});
     } catch (exception) {
         res.status(500).json({ error: exception });

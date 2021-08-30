@@ -1,12 +1,16 @@
 const jwt = require('jsonwebtoken')
 const argon2 = require('argon2')
 const User = require('../models/user')
+const Cart = require('../models/cart')
 
 const Login = async (req, res) => {
     const { email, password } = req.body
 
     const user = await User.findOne({ email })
-
+    const cart = await Cart
+        .findOne({ userId, type: 'cart' })
+        .select('_id')
+        .lean();
     const passwordCorrect = user === null
         ? false
         : await argon2.verify(user.password, password);
@@ -21,6 +25,7 @@ const Login = async (req, res) => {
         name: user.name,
         email: user.email,
         id: user._id,
+        cartId: cart._id
     }
 
     const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: 60*60*24 })

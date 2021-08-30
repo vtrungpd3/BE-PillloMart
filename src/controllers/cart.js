@@ -4,15 +4,19 @@ const Cart = require('../models/cart');
 const Product = require('../models/product');
 const CartItem = require('../models/cartItem');
 
-
-
-const getByUserId = async (req, res) => {
+const getAllCart = async (req, res) => {
     try {
-        const { id: userId } = req.userId;
+        const { id: userId, cartId } = req.userId;
         const { type } = req.body;
-        const cars = await Cart.find({ userId, type }).lean();
 
-        res.json({ result: cars });
+        let carts = [];
+        if (type) {
+            carts = await Cart.find({ userId, type }).lean();
+        } else {
+            carts = await CartItem.find({ cartId }).lean();
+        }
+
+        res.json({ result: carts });
     } catch (exception) {
         res.status(500).json({ error: exception });
     }
@@ -31,30 +35,25 @@ const getById = async (req, res) => {
 
 const addCart = async (req, res) => {
     try {
-        const { id: userId } = req.userId;
+        const { cartId } = req.userId;
         const { productId, quantity } = req.body;
 
         const product = await Product
             .findById(productId)
-            .select('_id amount')
+            .select('_id price')
             .lean();
 
         if (!product) {
             res.status(404).json({ error: 'Product not found!' });
         }
 
-        const cart = await Cart
-            .findOne({ userId, type: 'cart' })
-            .select('_id')
-            .lean();
-
         const cartItem = await CartItem
-            .findOneAndUpdate(
-                { productId, cardId: cart._id },
-                { $set: { quantity, amount: quantity * product.amount }},
-                { new: true, upsert: true, setDefaultsOnInsert: true }
-            )
-            .lean();
+                .findOneAndUpdate(
+                    { productId, cartId },
+                    { $set: { quantity, amount: quantity * product.price }},
+                    { new: true, upsert: true, setDefaultsOnInsert: true }
+                )
+                .lean();
 
         res.json({ status: true , result: cartItem });
     } catch (exception) {
@@ -106,8 +105,7 @@ const createOrder = async (req, res) => {
 // };
 
 module.exports = {
-    getByUserId,
-    // deleteById,
+    getAllCart,
     addCart,
     getById,
     createOrder,
