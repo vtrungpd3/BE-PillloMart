@@ -6,8 +6,8 @@ const CartItem = require('../models/cartItem');
 
 const getAllCart = async (req, res) => {
     try {
-        const { id: userId, cartId } = req.userId;
-        const { type } = req.body;
+        const { id: userId } = req.userId;
+        const { type = 'cart' } = req.body;
 
         const carts = await Cart.aggregate({ userId, type }).select('_id').lean();
 
@@ -147,19 +147,21 @@ const createOrder = async (req, res) => {
     }
 };
 
-// const deleteById = async (req, res) => {
-//     try {
-//         const user = await Cart.deleteOne({_id: req.params.id});
-//         if (!user.deleteCount) {
-//             return res.status(404).json({ result: false, message: 'Deleted fail' });
-//         }
-//         res.json({ result: true, message: 'Deleted successfully' });
-//         res.status(200).end();
-//     } catch (exception) {
-//         res.status(500).json({ error: exception });
-//     }
+
+const deleteById = async (req, res) => {
+    try {
+        const cart = await Cart.deleteOne({_id: req.params.id});
+        if (!cart.deleteCount) {
+            return res.status(404).json({ result: false, message: 'Deleted fail' });
+        }
+        res.json({ result: true, message: 'Deleted successfully' });
+        res.status(200).end();
+    } catch (exception) {
+        res.status(500).json({ error: exception });
+    }
     
-// };
+};
+
 
 module.exports = {
     getAllCart,
@@ -167,4 +169,5 @@ module.exports = {
     getDetail,
     createOrder,
     getCart,
+    deleteById
 };

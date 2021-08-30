@@ -8,6 +8,7 @@ const {
 	addCart,
 	getById,
 	createOrder,
+	deleteById
 } = require('../controllers/cart');
 
 /**
@@ -37,5 +38,12 @@ router.post('/', verifyToken, addCart);
  */
 
 router.post('/order', verifyToken, createOrder);
+
+/**
+ * @route DELETE api/Cart
+ * @access public
+ */
+
+router.delete('/:id', verifyToken, deleteById);
 
 module.exports = router;
