@@ -8,7 +8,7 @@ const Login = async (req, res) => {
 
     const user = await User.findOne({ email })
     const cart = await Cart
-        .findOne({ userId, type: 'cart' })
+        .findOne({ userId: user._id, type: 'cart' })
         .select('_id')
         .lean();
     const passwordCorrect = user === null

@@ -6,7 +6,7 @@ const verifyToken = require('../middleware/auth');
 const {
 	getAllCart,
 	addCart,
-	getById,
+	getDetail,
 	createOrder,
 	deleteById
 } = require('../controllers/cart');
@@ -23,7 +23,7 @@ router.get('/s', verifyToken, getAllCart);
  * @access public
  */
 
-router.get('/:id', verifyToken, getById);
+router.get('/:id', verifyToken, getDetail);
 
 /**
  * @route POST api/Cart

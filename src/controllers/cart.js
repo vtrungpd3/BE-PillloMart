@@ -9,12 +9,12 @@ const getAllCart = async (req, res) => {
         const { id: userId } = req.userId;
         const { type = 'cart' } = req.body;
 
-        const carts = await Cart.aggregate({ userId, type }).select('_id').lean();
+        const carts = await Cart.find({ userId, type }).select('_id').lean();
 
+        console.log('carts', carts);
         if (!carts.length) {
             res.json({ result: [] });
         }
-
         const result = await CartItem
             .aggregate([{
                 $match: {
@@ -29,12 +29,15 @@ const getAllCart = async (req, res) => {
                 }
             }, {
                 $lookup: {
-                    from: 'cart',
+                    from: 'carts',
                     localField: '_id',
                     foreignField: '_id',
                     as: 'cart'
                 }
-            }, {
+            },{
+                $unwind: "$cart"
+            },
+            {
                 $replaceRoot: {
                     newRoot: { $mergeObjects: [ {cartItems: "$cartItems"}, "$cart"] }
                 }
@@ -79,7 +82,7 @@ const getCart = async (req, res) => {
                 }
             }, {
                 $replaceRoot: {
-                    newRoot: { $mergeObjects: [ {cartItems: "$cartItems"}, "$cart"] }
+                    newRoot: { $mergeObjects: [ {cartItems: "$cartItem"}, "$cart"] }
                 }
             }])
 
@@ -150,7 +153,7 @@ const createOrder = async (req, res) => {
 
 const deleteById = async (req, res) => {
     try {
-        const cart = await Cart.deleteOne({_id: req.params.id});
+        const cart = await CartItem.deleteOne({_id: req.params.id});
         if (!cart.deleteCount) {
             return res.status(404).json({ result: false, message: 'Deleted fail' });
         }
