@@ -15,14 +15,14 @@ const productSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ['Gucci', 'Chanel', 'LV', 'Dior'],
-        default: 'Gucci',
+        enum: ['canada', 'usa', 'japan'],
+        default: 'canada',
         required: 'Please specify at least one factor.'
     },
     type: {
         type: String,
-        enum: ['Cam', 'Do', 'Den', 'Vang'],
-        default: 'Cam',
+        enum: ['cotton', 'rubber'],
+        default: 'cotton',
         required: 'Please specify at least one factor.'
     },
 }, {timestamps: true});
