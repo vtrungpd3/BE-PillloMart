@@ -9,14 +9,29 @@ const getAllCart = async (req, res) => {
         const { id: userId, cartId } = req.userId;
         const { type } = req.body;
 
-        let carts = [];
-        if (type) {
-            carts = await Cart.find({ userId, type }).lean();
-        } else {
-            carts = await CartItem.find({ cartId }).lean();
+        const carts = await Cart.find({ userId, type }).select('_id').lean();
+
+        if (!carts.length) {
+            res.json({ result: [] });
         }
 
-        res.json({ result: carts });
+        const rs = await CartItem
+            .find({ cartId: _.map(carts, x => x._id)})
+            .populate([{
+                path: 'cart',
+                select: 'quantity amount',
+                options: {
+                    lean: true,
+                  },
+            }])
+        // let carts = [];
+        // if (type) {
+        //     carts = await Cart.find({ userId, type }).lean();
+        // } else {
+        //     carts = await CartItem.find({ cartId }).lean();
+        // }
+
+        res.json({ result: rs });
     } catch (exception) {
         res.status(500).json({ error: exception });
     }

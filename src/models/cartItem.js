@@ -10,6 +10,7 @@ const cartItemSchema = new mongoose.Schema({
     cartId: {
         type: ObjectId,
         require: true,
+        ref: 'cart',
     },
     quantity: {
         type: Number,
