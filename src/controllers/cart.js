@@ -29,7 +29,7 @@ const getAllCart = async (req, res) => {
                 }
             }, {
                 $lookup: {
-                    from: 'user',
+                    from: 'cart',
                     localField: '_id',
                     foreignField: '_id',
                     as: 'cart'
@@ -72,7 +72,7 @@ const getCart = async (req, res) => {
                 }
             }, {
                 $lookup: {
-                    from: 'user',
+                    from: 'cart',
                     localField: '_id',
                     foreignField: '_id',
                     as: 'cart'
