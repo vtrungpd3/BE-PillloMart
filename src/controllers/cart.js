@@ -9,39 +9,81 @@ const getAllCart = async (req, res) => {
         const { id: userId, cartId } = req.userId;
         const { type } = req.body;
 
-        const carts = await Cart.find({ userId, type }).select('_id').lean();
+        const carts = await Cart.aggregate({ userId, type }).select('_id').lean();
 
         if (!carts.length) {
             res.json({ result: [] });
         }
 
-        const rs = await CartItem
-            .find({ cartId: _.map(carts, x => x._id)})
-            .populate([{
-                path: 'cart',
-                select: 'quantity amount',
-                options: {
-                    lean: true,
-                  },
+        const result = await CartItem
+            .aggregate([{
+                $match: {
+                    cartId: { $in: _.map(carts, x => x._id) }
+                }
+            }, {
+                $group: {
+                    _id:  "$cartId",
+                    cartItems: {
+                        $push: "$$ROOT",
+                    }
+                }
+            }, {
+                $lookup: {
+                    from: 'user',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'cart'
+                }
+            }, {
+                $replaceRoot: {
+                    newRoot: { $mergeObjects: [ {cartItems: "$cartItems"}, "$cart"] }
+                }
             }])
-        // let carts = [];
-        // if (type) {
-        //     carts = await Cart.find({ userId, type }).lean();
-        // } else {
-        //     carts = await CartItem.find({ cartId }).lean();
-        // }
 
-        res.json({ result: rs });
+        res.json({ result: result });
     } catch (exception) {
         res.status(500).json({ error: exception });
     }
 };
 
-const getById = async (req, res) => {
+const getDetail = async (req, res) => {
     try {
         const cart = await Cart.findById(req.params.id).lean();
 
         res.json({ result: cart });
+    } catch (exception) {
+        res.status(500).json({ error: exception });
+    }
+}
+
+const getCart = async (req, res) => {
+    try {
+        const { cartId } = req.user;
+
+        const result = await CartItem
+            .aggregate([{
+                $match: { cartId }
+            }, {
+                $group: {
+                    _id:  "$cartId",
+                    cartItems: {
+                        $push: "$$ROOT",
+                    }
+                }
+            }, {
+                $lookup: {
+                    from: 'user',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'cart'
+                }
+            }, {
+                $replaceRoot: {
+                    newRoot: { $mergeObjects: [ {cartItems: "$cartItems"}, "$cart"] }
+                }
+            }])
+
+        res.json({ result: result[0] });
     } catch (exception) {
         res.status(500).json({ error: exception });
     }
@@ -122,6 +164,7 @@ const createOrder = async (req, res) => {
 module.exports = {
     getAllCart,
     addCart,
-    getById,
+    getDetail,
     createOrder,
+    getCart,
 };
