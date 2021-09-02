@@ -4,9 +4,11 @@ const router = express.Router();
 const verifyToken = require('../middleware/auth');
 
 const {
-    getByUserId,
-    deleteById,
-    addCart,
+	getAllCart,
+	addCart,
+	getDetail,
+	createOrder,
+	deleteById
 } = require('../controllers/cart');
 
 /**
@@ -14,20 +16,33 @@ const {
  * @access public
  */
 
-router.get('/s', verifyToken, getByUserId);
+router.get('/s', verifyToken, getAllCart);
+
+/**
+ * @route GET api/:id
+ * @access public
+ */
+
+router.get('/:id', verifyToken, getDetail);
 
 /**
  * @route POST api/Cart
  * @access public
  */
 
- router.post('/', verifyToken, addCart);
+router.post('/', verifyToken, addCart);
 
- /**
-  * @route DELETE api/Cart/:id
-  * @description delete User
-  * @access public
-  */
+/**
+ * @route POST api/Cart
+ * @access public
+ */
+
+router.post('/order', verifyToken, createOrder);
+
+/**
+ * @route DELETE api/Cart
+ * @access public
+ */
 
 router.delete('/:id', verifyToken, deleteById);
 

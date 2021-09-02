@@ -1,4 +1,6 @@
 const User = require('../models/user');
+const Cart = require('../models/cart');
+
 const argon2 = require('argon2');
 const { validatePassword } = require('../Constants/enum')
 
@@ -57,6 +59,9 @@ const createUser = async (req, res) => {
         const resUser = await User.create(data);
         const objNew = resUser.toJSON();
         delete objNew.password;
+
+        // Create Cart
+        await Cart.create({ userId: objNew.id, type: 'cart' });
 
         res.json({result: objNew});
     } catch (exception) {

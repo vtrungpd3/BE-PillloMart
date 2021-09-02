@@ -1,10 +1,10 @@
-const Cart = require('../models/cart');
+const CartItem = require('../models/cartItem');
 const User = require('../models/user');
 
 const getAll = async (req, res) => {
     try {
         const { userId } = req.body;
-        const users = await Cart.find({ userId }).lean();
+        const users = await CartItem.find({ userId }).lean();
 
         res.json({ result: users });
     } catch (exception) {

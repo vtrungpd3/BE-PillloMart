@@ -7,7 +7,7 @@ const cartItemSchema = new mongoose.Schema({
         type: ObjectId,
         require: true,
     },
-    cardId: {
+    cartId: {
         type: ObjectId,
         require: true,
     },
