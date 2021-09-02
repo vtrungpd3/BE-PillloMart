@@ -28,7 +28,7 @@ const Login = async (req, res) => {
         cartId: cart._id
     }
 
-    const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: 60*60*24 })
+    const token = jwt.sign(userForToken, "bearer", { expiresIn: 60*60*24 })
 
     res.status(200).send({ token, email: user.email, name: user.name })
 };
