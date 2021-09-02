@@ -1,8 +1,8 @@
 const User = require('../models/user');
 const Cart = require('../models/cart');
+const { validatePassword } = require('../constants/enum');
 
 const argon2 = require('argon2');
-const { validatePassword } = require('../Constants/enum')
 
 const getAll = async (req, res) => {
     try {
