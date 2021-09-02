@@ -11,7 +11,6 @@ const getAllCart = async (req, res) => {
 
         const carts = await Cart.find({ userId, type }).select('_id').lean();
 
-        console.log('carts', carts);
         if (!carts.length) {
             res.json({ result: [] });
         }
