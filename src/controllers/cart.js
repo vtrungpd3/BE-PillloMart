@@ -50,9 +50,9 @@ const getAllCart = async (req, res) => {
 
 const getByIdCart = async (req, res) => {
     try {
-        const cart = await Cart.findById(req.params.id).lean();
+        const result = await Cart.findById(req.params.id).lean();
 
-        res.json({ status: true, result: cart });
+        res.json({ status: true, result });
     } catch (exception) {
         res.status(500).json({ status: false, error: exception });
     }
