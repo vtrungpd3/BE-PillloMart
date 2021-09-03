@@ -11,7 +11,7 @@ const {
 } = require('../controllers/user');
 
 /**
- * @route GET api/User
+ * @route POST api/user/s
  * @description get all User
  * @access public
  */
@@ -20,7 +20,7 @@ router.post('/s', getAll);
 
 
 /**
- * @route GET api/User/:id
+ * @route GET api/user/:id
  * @description get by id User
  * @access public
  */
@@ -29,7 +29,7 @@ router.get('/:id', getById);
 
 
 /**
- * @route POST/api/User
+ * @route POST/api/user
  * @description add a new User
  * @access public
  */
@@ -37,7 +37,7 @@ router.get('/:id', getById);
 router.post('/', createUser);
 
 /**
- * @route PUT api/User/:id
+ * @route PUT api/user/:id
  * @description update User
  * @access public
  */
@@ -45,7 +45,7 @@ router.post('/', createUser);
 router.put('/:id', updateById);
 
 /**
-  * @route DELETE api/User/:id
+  * @route DELETE api/user/:id
   * @description delete User
   * @access public
   */

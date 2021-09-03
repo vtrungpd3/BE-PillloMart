@@ -1,16 +1,17 @@
-const jwt = require('jsonwebtoken')
-const argon2 = require('argon2')
-const User = require('../models/user')
-const Cart = require('../models/cart')
+const jwt = require('jsonwebtoken');
+const argon2 = require('argon2');
+const User = require('../models/user');
+const Cart = require('../models/cart');
 
 const Login = async (req, res) => {
-    const { email, password } = req.body
+    const { email, password } = req.body;
 
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email });
     const cart = await Cart
         .findOne({ userId: user._id, type: 'cart' })
         .select('_id')
         .lean();
+
     const passwordCorrect = user === null
         ? false
         : await argon2.verify(user.password, password);
@@ -18,7 +19,7 @@ const Login = async (req, res) => {
     if (!(user && passwordCorrect)) {
         return res.status(401).json({
             error: 'invalid email or password'
-        })
+        });
     }
 
     const userForToken = {
@@ -26,11 +27,11 @@ const Login = async (req, res) => {
         email: user.email,
         id: user._id,
         cartId: cart._id
-    }
+    };
 
-    const token = jwt.sign(userForToken, "bearer", { expiresIn: 60*60*24 })
+    const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: 60*60*24 });
 
-    res.status(200).send({ token, email: user.email, name: user.name })
+    res.status(200).send({ token, email: user.email, name: user.name });
 };
 
 module.exports = {

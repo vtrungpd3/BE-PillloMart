@@ -21,9 +21,9 @@ const getAllCart = async (req, res) => {
                 }
             }, {
                 $group: {
-                    _id:  "$cartId",
+                    _id:  '$cartId',
                     cartItems: {
-                        $push: "$$ROOT",
+                        $push: '$$ROOT',
                     }
                 }
             }, {
@@ -34,29 +34,29 @@ const getAllCart = async (req, res) => {
                     as: 'cart'
                 }
             },{
-                $unwind: "$cart"
+                $unwind: '$cart'
             },
             {
                 $replaceRoot: {
-                    newRoot: { $mergeObjects: [ {cartItems: "$cartItems"}, "$cart"] }
+                    newRoot: { $mergeObjects: [ {cartItems: '$cartItems'}, '$cart'] }
                 }
-            }])
+            }]);
 
-        res.json({ result: result });
+        res.json({ status: true, result });
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
 };
 
-const getDetail = async (req, res) => {
+const getByIdCart = async (req, res) => {
     try {
         const cart = await Cart.findById(req.params.id).lean();
 
-        res.json({ result: cart });
+        res.json({ status: true, result: cart });
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
-}
+};
 
 const getCart = async (req, res) => {
     try {
@@ -67,9 +67,9 @@ const getCart = async (req, res) => {
                 $match: { cartId }
             }, {
                 $group: {
-                    _id:  "$cartId",
+                    _id:  '$cartId',
                     cartItems: {
-                        $push: "$$ROOT",
+                        $push: '$$ROOT',
                     }
                 }
             }, {
@@ -81,18 +81,18 @@ const getCart = async (req, res) => {
                 }
             }, {
                 $replaceRoot: {
-                    newRoot: { $mergeObjects: [ {cartItems: "$cartItem"}, "$cart"] }
+                    newRoot: { $mergeObjects: [ {cartItems: '$cartItem'}, '$cart'] }
                 }
-            }])
+            }]);
 
-        res.json({ result: result[0] });
+        res.json({ status: true, result: result[0] });
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
-}
+};
 
 
-const addCart = async (req, res) => {
+const createCart = async (req, res) => {
     try {
         const { cartId } = req.userId;
         const { productId, quantity } = req.body;
@@ -103,20 +103,20 @@ const addCart = async (req, res) => {
             .lean();
 
         if (!product) {
-            res.status(404).json({ error: 'Product not found!' });
+            res.status(404).json({ status: false, error: 'Product not found!' });
         }
 
-        const cartItem = await CartItem
-                .findOneAndUpdate(
-                    { productId, cartId },
-                    { $set: { quantity, amount: quantity * product.price }},
-                    { new: true, upsert: true, setDefaultsOnInsert: true }
-                )
-                .lean();
+        const result = await CartItem
+            .findOneAndUpdate(
+                { productId, cartId },
+                { $set: { quantity, amount: quantity * product.price }},
+                { new: true, upsert: true, setDefaultsOnInsert: true }
+            )
+            .lean();
 
-        res.json({ status: true , result: cartItem });
+        res.json({ status: true , result });
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
 };
 
@@ -135,17 +135,17 @@ const createOrder = async (req, res) => {
         const amount = _.sumBy(cartItems, xx => xx.amount);
 
         // Create Order
-        const order = await Cart.create({ quantity, amount, userId, type: 'order' }); 
+        const result = await Cart.create({ quantity, amount, userId, type: 'order' }); 
 
         // Update cartItems
         await CartItem.updateMany(
             { _id: { $in: cartItemIds }, cardId }, 
-            { cardId: order._id  }
+            { cardId: result._id  }
         );
 
-        res.json({ status: true , result: order });
+        res.json({ status: true, result });
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
 };
 
@@ -153,13 +153,14 @@ const createOrder = async (req, res) => {
 const deleteById = async (req, res) => {
     try {
         const cart = await CartItem.deleteOne({_id: req.params.id});
+
         if (!cart.deleteCount) {
             return res.status(404).json({ result: false, message: 'Deleted fail' });
         }
-        res.json({ result: true, message: 'Deleted successfully' });
-        res.status(200).end();
+        
+        res.status(200).json({ result: true, message: 'Deleted successfully' });
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ result: false, error: exception });
     }
     
 };
@@ -167,8 +168,8 @@ const deleteById = async (req, res) => {
 
 module.exports = {
     getAllCart,
-    addCart,
-    getDetail,
+    createCart,
+    getByIdCart,
     createOrder,
     getCart,
     deleteById

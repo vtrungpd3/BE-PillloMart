@@ -20,12 +20,12 @@ const getAll = async (req, res) => {
         const users = await User.find({ $or: [search] }).lean();
         const data = users.map((user) => {
             delete user.password;
-            return user
-        })
+            return user;
+        });
 
-        res.json({ result: data });
+        res.json({ status: true, result: data });
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
 };
 
@@ -33,12 +33,12 @@ const getById = async (req, res) => {
     try {
         const result = await User.findById(req.params.id);
         if (result) {
-            res.json({ result });
+            res.json({ status: true, result });
         } else {
-            res.status(404).end();
+            res.status(404).json({ status: false, message: 'id not found' });
         }
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
 };
 
@@ -46,7 +46,7 @@ const createUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
         if (!validatePassword(password)) {
-            return res.status(404).json({ error: "Password not valid"})
+            return res.status(404).json({ status: false, error: 'Password not valid'});
         }
 
         const hash = await argon2.hash(password);
@@ -63,39 +63,33 @@ const createUser = async (req, res) => {
         // Create Cart
         await Cart.create({ userId: objNew.id, type: 'cart' });
 
-        res.json({result: objNew});
+        res.json({ status: true, result: objNew });
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
 };
 
 const deleteById = async (req, res) => {
     try {
-        const user = await User.deleteOne({_id: req.params.id});
+        const user = await User.deleteOne({ _id: req.params.id });
         if (!user.deleteCount) {
-            return res.status(404).json({ result: false, message: 'Deleted fail' });
+            return res.status(404).json({ status: false, message: 'Deleted fail' });
         }
-        res.json({ result: true, message: 'Deleted successfully' });
-        res.status(200).end();
+        res.status(200).json({ status: true, message: 'Deleted successfully' });
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
     
 };
 
 const updateById = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
-        const data = new User({
-            name,
-            email,
-            password,
-        });
+        const { name } = req.body;
 
-        const updateUser = await User.findByIdAndUpdate(req.params.id, data, { new: true });
-        res.json(updateUser);
+        const updateUser = await User.findByIdAndUpdate(req.params.id, { name }, { new: true });
+        res.status(200).json({ status: true, result: updateUser });
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
 };
 

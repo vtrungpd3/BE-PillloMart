@@ -8,6 +8,7 @@ const productSchema = new mongoose.Schema({
     },
     avatar: {
         type: String,
+        require: true
     },
     price: {
         type: Number,

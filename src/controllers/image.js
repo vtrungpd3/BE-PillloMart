@@ -34,11 +34,12 @@ const uploadImage = async (req, res) => {
         if (err || req.file === undefined) {
             res.status(500).json({ data: 'File not found' });
         } else {
-            return res.status(200).json({ imageURL: '/avatar/' + req.file.filename });
+            return res.status(200).json({ imageURL: req.file.filename });
         }
     });
 };
 
 module.exports = {
     uploadImage,
+    upload
 };

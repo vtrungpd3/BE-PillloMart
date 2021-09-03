@@ -7,7 +7,7 @@ const {
 } = require('../controllers/login');
 
 /**
- * @route POST api/Login
+ * @route POST api/login
  * @access public
  */
 

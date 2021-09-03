@@ -17,59 +17,61 @@ const getAll = async (req, res) => {
         if (type) {
             search.type = type;
         }
-        
-        const products = await Product.find({ $or: [search] }).limit(10 * pageIndex).lean();
-        const total = await Product.findOne({ _id: { $gt: products[products.length - 1]._id } }).select("_id").lean();
-        const hasNextPage = total ? true : false;
 
-        res.json({ result: products, pageInfo: { hasNextPage, pageIndex }});
+        const result = await Product.find({ $or: [search] }).limit(10 * pageIndex).lean();
+        const nextData = await Product.findOne({ _id: { $gt: result[result.length - 1]?._id } }).select('_id').lean();
+        const hasNextPage = nextData ? true : false;
+
+        res.json({ status: true, result, pageInfo: { hasNextPage, pageIndex }});
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
 };
 
 const getById = async (req, res) => {
     try {
         const result = await Product.findById(req.params.id);
+
         if (result) {
-            res.json({ result });
+            res.json({ status: true, result });
         } else {
             res.status(404).end();
         }
+
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
 };
 
 const createProduct = async (req, res) => {
     try {
-        const { name, price, category, type, avatar } = req.body;
+        const { name, price, category, type } = req.body;
+
         const data = {
             name,
             price,
             category,
             type,
-            avatar
+            avatar: req.file.filename
         };
 
-        const resProduct = await Product.create(data);
+        const result = await Product.create(data);
 
-        res.json({result: resProduct});
+        res.json({ status: true, result });
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
 };
 
 const deleteById = async (req, res) => {
     try {
-        const product = await Product.deleteOne({_id: req.params.id});
-        if (!product.deleteCount) {
-            return res.status(404).json({ result: false, message: 'Deleted fail' });
+        const result = await Product.deleteOne({_id: req.params.id});
+        if (!result.deleteCount) {
+            return res.status(404).json({ status: false, message: 'Deleted fail' });
         }
-        res.json({ result: true, message: 'Deleted successfully' });
-        res.status(200).end();
+        res.status(200).json({ status: true, message: 'Deleted successfully' });
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
     
 };
@@ -85,10 +87,10 @@ const updateById = async (req, res) => {
             avatar
         });
 
-        const updateProduct = await Product.findByIdAndUpdate(req.params.id, data, { new: true });
-        res.json(updateProduct);
+        const result = await Product.findByIdAndUpdate(req.params.id, data, { new: true });
+        res.json({ status: true, result });
     } catch (exception) {
-        res.status(500).json({ error: exception });
+        res.status(500).json({ status: false, error: exception });
     }
 };
 

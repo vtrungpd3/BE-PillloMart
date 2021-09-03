@@ -1,6 +1,7 @@
-// === Route note ===
+// === Route Product ===
 const express = require('express');
 const router = express.Router();
+const { upload } = require('../controllers/image');
 
 const {
     getAll,
@@ -11,8 +12,8 @@ const {
 } = require('../controllers/product');
 
 /**
- * @route GET api/note
- * @description get all note
+ * @route POST api/product/s
+ * @description get all product
  * @access public
  */
 
@@ -20,8 +21,8 @@ router.post('/s', getAll);
 
 
 /**
- * @route GET api/note/:id
- * @description get by id note
+ * @route GET api/product/:id
+ * @description get by id product
  * @access public
  */
 
@@ -29,24 +30,24 @@ router.get('/:id', getById);
 
 
 /**
- * @route POST/api/note
- * @description add a new note
+ * @route POST/api/product
+ * @description add a new product
  * @access public
  */
 
-router.post('/', createProduct);
+router.post('/', upload, createProduct);
 
 /**
- * @route PUT api/note/:id
- * @description update note
+ * @route PUT api/product/:id
+ * @description update product
  * @access public
  */
 
 router.put('/:id', updateById);
 
 /**
-  * @route DELETE api/note/:id
-  * @description delete note
+  * @route DELETE api/product/:id
+  * @description delete product
   * @access public
   */
 
