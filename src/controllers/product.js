@@ -6,6 +6,8 @@ const getAll = async (req, res) => {
         const { name, category, type, pageInfo } = req.body;
         const { pageIndex = 1 } = pageInfo || {};
 
+        console.log('req.body', req.body);
+
         if (name) {
             search.name = new RegExp(name, 'gim');
         }
@@ -18,11 +20,10 @@ const getAll = async (req, res) => {
             search.type = type;
         }
 
-        const result = await Product.find({ $or: [search] }).limit(10 * pageIndex).lean();
-        const nextData = await Product.findOne({ _id: { $gt: result[result.length - 1]?._id } }).select('_id').lean();
-        const hasNextPage = nextData ? true : false;
+        const result = await Product.find(search).skip((pageIndex - 1) * 10).limit(11).lean();
+        const hasNextPage = result.length === 11;
 
-        res.json({ status: true, result, pageInfo: { hasNextPage, pageIndex }});
+        res.json({ status: true, result: result.slice(0, 10), pageInfo: { hasNextPage, pageIndex }});
     } catch (exception) {
         res.status(500).json({ status: false, error: exception });
     }
