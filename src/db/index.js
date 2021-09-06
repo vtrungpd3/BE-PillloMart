@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-const { MONGODB } = require('../config');
+// const { MONGODB } = require('../config');
 
 const ConnectDB = async () => {
     try {
-        await mongoose.connect(MONGODB, { useNewUrlParser: true, useUnifiedTopology: true , useCreateIndex: true, useFindAndModify: true });
+        await mongoose.connect('mongodb+srv://admin:admin@pillowmart.pv3ig.mongodb.net/pillloMart?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true , useCreateIndex: true, useFindAndModify: true });
         console.log('MongoDB is connected');
     } catch (err) {
         console.error(err.message);
