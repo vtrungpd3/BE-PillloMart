@@ -94,7 +94,7 @@ const getCart = async (req, res) => {
 
 const createCart = async (req, res) => {
     try {
-        const { cartId } = req.userId;
+        let { cartId, userId } = req.userId;
         const { productId, quantity } = req.body;
 
         const product = await Product
@@ -104,6 +104,12 @@ const createCart = async (req, res) => {
 
         if (!product) {
             res.status(404).json({ status: false, error: 'Product not found!' });
+        }
+
+        const cart = await Cart.findById(cartId).select('_id').lean();
+
+        if (!cart) {
+            cartId = (await Cart.create({ userId, type: 'cart' }))?._id;
         }
 
         const result = await CartItem

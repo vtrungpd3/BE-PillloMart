@@ -56,14 +56,9 @@ const createUser = async (req, res) => {
             password: hash,
         };
         
-        const resUser = await User.create(data);
-        const objNew = resUser.toJSON();
-        delete objNew.password;
+        await Promise.all([User.create(data), Cart.create({ userId: objNew.id, type: 'cart' }) ])
 
-        // Create Cart
-        await Cart.create({ userId: objNew.id, type: 'cart' });
-
-        res.json({ status: true, result: objNew });
+        res.json({ status: true });
     } catch (exception) {
         res.status(500).json({ status: false, error: exception });
     }

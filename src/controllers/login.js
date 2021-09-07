@@ -7,11 +7,7 @@ const Login = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    const cart = await Cart
-        .findOne({ userId: user._id, type: 'cart' })
-        .select('_id')
-        .lean();
-
+    
     const passwordCorrect = user === null
         ? false
         : await argon2.verify(user.password, password);
@@ -20,6 +16,15 @@ const Login = async (req, res) => {
         return res.status(401).json({
             error: 'invalid email or password'
         });
+    }
+
+    let cart = await Cart
+        .findOne({ userId: user._id, type: 'cart' })
+        .select('_id')
+        .lean();
+
+    if (cart) {
+        cart = await Cart.create({ userId: user._id, type: 'cart' });
     }
 
     const userForToken = {

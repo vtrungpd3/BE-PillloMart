@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const ConnectDB = require('./src/db');
+const connect = require('./src/services/mongo');
 const config = require('./src/config');
 const initAppRoute = require('./src/routers');
 
@@ -14,7 +14,7 @@ app.use(express.json());
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-ConnectDB();
+connect();
 initAppRoute(app);
 
 app.listen(config.PORT, () => {

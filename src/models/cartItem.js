@@ -1,8 +1,7 @@
-const mongoose = require('mongoose');
+const { Schema, model } = require('mongoose');
+const { ObjectId } = Schema.Types;
 
-const { ObjectId } = mongoose.Schema.Types;
-
-const cartItemSchema = new mongoose.Schema({
+const cartItemSchema = new Schema({
     productId: {
         type: ObjectId,
         require: true,
@@ -20,4 +19,4 @@ const cartItemSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
-module.exports = mongoose.model('CartItem', cartItemSchema);
+module.exports = model('CartItem', cartItemSchema);

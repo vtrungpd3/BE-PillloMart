@@ -30,7 +30,7 @@ const upload = multer({
 }).single('image');
 
 const uploadImage = async (req, res) => {
-    upload(req, res, err => {
+    await upload(req, res, err => {
         if (err || req.file === undefined) {
             res.status(500).json({ data: 'File not found' });
         } else {

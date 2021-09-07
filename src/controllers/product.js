@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const UploadFile = require('../services/firebase');
 
 const getAll = async (req, res) => {
     try {
@@ -47,13 +48,14 @@ const getById = async (req, res) => {
 const createProduct = async (req, res) => {
     try {
         const { name, price, category, type } = req.body;
+        const avatar = await UploadFile(`uploads/${req.file.filename}`, req.file.filename);
 
         const data = {
             name,
             price,
             category,
             type,
-            avatar: req.file.filename
+            avatar
         };
 
         const result = await Product.create(data);

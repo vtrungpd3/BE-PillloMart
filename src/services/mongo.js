@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 // const { MONGODB } = require('../config');
 
-const ConnectDB = async () => {
+const connect = async () => {
     try {
         await mongoose.connect('mongodb+srv://admin:admin@pillowmart.pv3ig.mongodb.net/pillloMart?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true , useCreateIndex: true, useFindAndModify: true });
         console.log('MongoDB is connected');
@@ -10,4 +10,4 @@ const ConnectDB = async () => {
     }
 };
 
-module.exports = ConnectDB;
+module.exports = connect;
