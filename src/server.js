@@ -24,9 +24,9 @@ const start = (appConfig, apiConfig) => {
     apiServer.get('/', (request, response) => {
         response.send('<h1>Hello World!</h1>');
     });
-    
+
     applyDefaultMiddleware(apiServer, appConfig);
-    initAppRoute(apiServer, apiConfig.prefix, authHeaderKey);
+    // initAppRoute(apiServer, apiConfig.prefix, authHeaderKey);
 
     apiServer.listen(port, () => {
         console.log('\x1b[36m%s\x1b[0m', '[Server]', '\x1b[0m', `Running on port ${port}`);
