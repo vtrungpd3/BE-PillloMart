@@ -1,6 +1,6 @@
 module.exports = {
     app: {
-        port: 7799,
+        port: 8080,
         morganEnable: true, // logs
         authHeaderKey: 'authorization',
         jwt: {
