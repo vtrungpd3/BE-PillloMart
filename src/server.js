@@ -21,6 +21,10 @@ const start = (appConfig, apiConfig) => {
     const { port, authHeaderKey } = appConfig;
     const apiServer = express();
     
+    apiServer.get('/', (request, response) => {
+        response.send('<h1>Hello World!</h1>');
+    });
+    
     applyDefaultMiddleware(apiServer, appConfig);
     initAppRoute(apiServer, apiConfig.prefix, authHeaderKey);
 
