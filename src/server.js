@@ -2,12 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
 
 const initAppRoute = require('./routers');
 
 const applyDefaultMiddleware = (server, appConfig) => {
     server.use(cors());
     server.use(express.json());
+    server.use(bodyParser.json());
     server.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
     if (appConfig.morganEnable) {
