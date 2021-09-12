@@ -7,7 +7,7 @@ const cart = require('./cart');
 const authService = require('../services/authentication');
 
 const initAppRoute = (server, prefix, authHeaderKey) => {
-    server.use(`${prefix}/product`, authService.authentication(authHeaderKey), product);
+    server.use(`${prefix}/product`, product);
     server.use(`${prefix}/upload`, image);
     server.use(`${prefix}/login`, login);
     server.use(`${prefix}/user`, user);
