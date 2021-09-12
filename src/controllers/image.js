@@ -1,45 +1,45 @@
 const path = require('path');
 const multer = require('multer');
+const { rootPath, limit, bodyField, mimeGroup } = require('../config').storage;
+const { common } = require('../utils');
+
+const controllers = {};
 
 const storage = multer.diskStorage({
-    destination: './uploads',
+    destination: rootPath,
     filename: function (req, file, cb) {
         cb(null, Date.now() + path.extname(file.originalname));
     },
 });
 
 const checkFileType = (file, cb) => {
-    const filetypes = /bmp|gif|ico|jpeg|jpg|png|svg|tif|tiff|webp/;
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype);
+    const mimetype = mimeGroup.image.includes(file.mimetype);
 
-    if (mimetype && extname) {
+    if (mimetype) {
         return cb(null, true);
     }
     cb('The file is not in the correct format');
 };
 
-const upload = multer({
+controllers.upload = multer({
     storage,
     limits: {
-        fileSize: 1024 * 1024 * 5,
+        fileSize: limit,
     },
     fileFilter: (req, file, cb) => {
         checkFileType(file, cb);
     },
-}).single('image');
+}).single(bodyField);
 
-const uploadImage = async (req, res) => {
-    await upload(req, res, err => {
+
+controllers.uploadImage = async (req, res) => {
+    await controllers.upload(req, res, err => {
         if (err || req.file === undefined) {
-            res.status(500).json({ data: 'File not found' });
+            common.errorCommonResponse(res, 'File not found');
         } else {
-            return res.status(200).json({ imageURL: req.file.filename });
+            common.successResponse(res, req.file.filename);
         }
     });
 };
 
-module.exports = {
-    uploadImage,
-    upload
-};
+module.exports = controllers;

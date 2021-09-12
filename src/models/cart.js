@@ -15,13 +15,8 @@ const cartSchema = new Schema({
     amount: {
         type: Number,
         default: 0
-    },
-    type: {
-        type: String,
-        enum: ['cart', 'order'],
-        default: 'cart',
     }
-}, {timestamps: true});
+}, {timestamps: true, versionKey: false});
 
 
 module.exports = model('Cart', cartSchema);

@@ -1,13 +1,22 @@
 const mongoose = require('mongoose');
-// const { MONGODB } = require('../config');
 
-const connect = async () => {
-    try {
-        await mongoose.connect('mongodb+srv://admin:admin@pillowmart.pv3ig.mongodb.net/pillloMart?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true , useCreateIndex: true, useFindAndModify: true });
-        console.log('MongoDB is connected');
-    } catch (err) {
-        console.error(err.message);
-    }
+const onConnect = () => {
+    console.log('\x1b[31m%s\x1b[0m', '[Mongo]', '\x1b[0m', 'Connect Successfully');
 };
 
-module.exports = connect;
+const onError = (error) => {
+    console.log('\x1b[31m%s\x1b[0m', '[Mongo] Error: ', '\x1b[0m', error);
+};
+
+const connect = async (mongoConfig) => {
+    const db = mongoose.connection;
+
+    db.on('error', onError);
+    db.on('open', onConnect);
+
+    await mongoose.connect(mongoConfig.uri, mongoConfig.options);
+};
+
+module.exports = {
+    connect
+};

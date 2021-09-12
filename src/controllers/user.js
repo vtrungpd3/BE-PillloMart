@@ -1,97 +1,82 @@
 const User = require('../models/user');
 const Cart = require('../models/cart');
-const { validatePassword } = require('../utils/common');
+const { genSalt } = require('../services/bcrypt');
+const { successResponse, errorCommonResponse, validatePassword } = require('../utils').common;
+const UploadImage = require('../services/firebase');
 
-const argon2 = require('argon2');
+const controllers = {};
 
-const getAll = async (req, res) => {
-    try {
-        let search = {};
-        const { name, email } = req.body;
-
-        if (name) {
-            search.name = new RegExp(name, 'gim');
-        }
-
-        if (email) {
-            search.email = email;
-        }
-
-        const users = await User.find({ $or: [search] }).lean();
-        const data = users.map((user) => {
-            delete user.password;
-            return user;
-        });
-
-        res.json({ status: true, result: data });
-    } catch (exception) {
-        res.status(500).json({ status: false, error: exception });
-    }
-};
-
-const getById = async (req, res) => {
+controllers.getById = async (req, res) => {
     try {
         const result = await User.findById(req.params.id);
         if (result) {
-            res.json({ status: true, result });
+            successResponse(res, result);
         } else {
-            res.status(404).json({ status: false, message: 'id not found' });
+            errorCommonResponse(res, 'id not found');
         }
     } catch (exception) {
-        res.status(500).json({ status: false, error: exception });
+        errorCommonResponse(res, exception);
     }
 };
 
-const createUser = async (req, res) => {
+controllers.createUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
+
         if (!validatePassword(password)) {
-            return res.status(404).json({ status: false, error: 'Password not valid'});
+            return errorCommonResponse(res, 'Password not valid');
         }
 
-        const hash = await argon2.hash(password);
+        const hash = await genSalt(password);
         const data = {
             name,
             email,
             password: hash,
         };
         
-        await Promise.all([User.create(data), Cart.create({ userId: objNew.id, type: 'cart' }) ])
+        const user = await User.create(data);
 
-        res.json({ status: true });
-    } catch (exception) {
-        res.status(500).json({ status: false, error: exception });
-    }
-};
+        if (!user._id) {
+            return errorCommonResponse(res, 'Create user failed');
+        } 
 
-const deleteById = async (req, res) => {
-    try {
-        const user = await User.deleteOne({ _id: req.params.id });
-        if (!user.deleteCount) {
-            return res.status(404).json({ status: false, message: 'Deleted fail' });
+        const cart = await Cart.create({ userId: user._id });
+
+        if (!cart._id) {
+            return errorCommonResponse(res, 'Create cart failed');
         }
-        res.status(200).json({ status: true, message: 'Deleted successfully' });
+
+        successResponse(res);
     } catch (exception) {
-        res.status(500).json({ status: false, error: exception });
+        return errorCommonResponse(res, exception);
     }
-    
 };
 
-const updateById = async (req, res) => {
+controllers.updateById = async (req, res) => {
     try {
-        const { name } = req.body;
+        const dataReq = req.body;
 
-        const updateUser = await User.findByIdAndUpdate(req.params.id, { name }, { new: true });
-        res.status(200).json({ status: true, result: updateUser });
+        if (req.file.filename) {
+            dataReq.avatar = await UploadImage(`uploads/${req.file.filename}`, req.file.filename);
+        }
+
+        if (!dataReq.avatar && req.file.filename) {
+            return errorCommonResponse(res, 'Upload avatar User failed');
+        }
+
+        const result = await User.findByIdAndUpdate(req.params.id, { ...dataReq }, { new: true }).lean();
+
+        if (!result._id) {
+            return errorCommonResponse(res, 'Update user failed');
+        }
+        
+        // eslint-disable-next-line
+        const { password: _, ...payload } = result;
+
+        successResponse(res, {...payload});
     } catch (exception) {
-        res.status(500).json({ status: false, error: exception });
+        return errorCommonResponse(res, exception);
     }
 };
 
-module.exports = {
-    getAll,
-    getById,
-    deleteById,
-    updateById,
-    createUser,
-};
+module.exports = controllers;

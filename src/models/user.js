@@ -7,6 +7,9 @@ const userSchema = new Schema({
         require: true,
         minLength: 5
     },
+    avatar: {
+        type: String,
+    },
     email: {
         type: String,
         trim: true,
@@ -19,6 +22,6 @@ const userSchema = new Schema({
         type: String,
         require: true,
     },
-}, {timestamps: true});
+}, {timestamps: true, versionKey: false});
 
 module.exports = model('User', userSchema);

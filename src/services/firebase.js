@@ -1,18 +1,16 @@
 const firebaseAdmin = require('firebase-admin');
 const { v4: uuidv4 } = require('uuid');
-
-const serviceAccount = require('../pilllowmart-firebase-adminsdk-89jar-12f889c612.json');
+const { serviceAccount, bucket, url } = require('../config').firebase;
 
 const admin = firebaseAdmin.initializeApp({
     credential: firebaseAdmin.credential.cert(serviceAccount),
 });
 
-const storageRef = admin.storage().bucket(`gs://pilllowmart.appspot.com`);
+const storageRef = admin.storage().bucket(bucket);
 
-const uploadFile = async (path, filename) => {
+const uploadImage = async (path, filename) => {
 
-    // Upload the File
-    await storageRef.upload(path, {
+    const data = await storageRef.upload(path, {
         public: true,
         destination: filename,
         metadata: {
@@ -20,8 +18,11 @@ const uploadFile = async (path, filename) => {
         }
     });
 
-    const url = `https://firebasestorage.googleapis.com/v0/b/pilllowmart.appspot.com/o/${filename}?alt=media&token=${uuidv4()}`;
-    return url;
-}
+    if (!data[0].metadata.mediaLink) {
+        return null;
+    }
 
-module.exports = uploadFile;
+    return url(filename, uuidv4());
+};
+
+module.exports = uploadImage;

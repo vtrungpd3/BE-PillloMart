@@ -17,6 +17,16 @@ const cartItemSchema = new Schema({
     amount: {
         type: Number
     }
-}, {timestamps: true});
+}, {
+    timestamps: true,
+    versionKey: false,
+});
+
+cartItemSchema.virtual('products', {
+    ref: 'Product',
+    localField: 'productId',
+    foreignField: '_id',
+    justOne: true,
+});
 
 module.exports = model('CartItem', cartItemSchema);

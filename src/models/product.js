@@ -26,6 +26,6 @@ const productSchema = new Schema({
         default: 'cotton',
         required: 'Please specify at least one factor.'
     },
-}, {timestamps: true});
+}, {timestamps: true, versionKey: false});
 
 module.exports = model('Product', productSchema);

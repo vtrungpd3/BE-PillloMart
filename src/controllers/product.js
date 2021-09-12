@@ -1,13 +1,15 @@
 const Product = require('../models/product');
-const UploadFile = require('../services/firebase');
+const UploadImage = require('../services/firebase');
+const { pagination: { index, size } } = require('../config').api;
+const { successResponse, errorCommonResponse } = require('../utils').common;
 
-const getAll = async (req, res) => {
+const controller = {};
+
+controller.getAll = async (req, res) => {
     try {
         let search = {};
         const { name, category, type, pageInfo } = req.body;
-        const { pageIndex = 1 } = pageInfo || {};
-
-        console.log('req.body', req.body);
+        const { pageIndex = index.default } = pageInfo || {};
 
         if (name) {
             search.name = new RegExp(name, 'gim');
@@ -21,34 +23,41 @@ const getAll = async (req, res) => {
             search.type = type;
         }
 
-        const result = await Product.find(search).skip((pageIndex - 1) * 10).limit(11).lean();
-        const hasNextPage = result.length === 11;
+        if (pageIndex < index.min) {
+            return errorCommonResponse(res, 'pageIndex is out of range');
+        }
 
-        res.json({ status: true, result: result.slice(0, 10), pageInfo: { hasNextPage, pageIndex }});
+        const result = await Product.find(search).skip(pageIndex * size.default).limit(size.max).lean();
+        const hasNextPage = result.length === size.max;
+
+        successResponse(res, result.slice(0, 10), { pageInfo: { hasNextPage, pageIndex } });
     } catch (exception) {
-        res.status(500).json({ status: false, error: exception });
+        errorCommonResponse(res, exception);
     }
 };
 
-const getById = async (req, res) => {
+controller.getById = async (req, res) => {
     try {
         const result = await Product.findById(req.params.id);
 
-        if (result) {
-            res.json({ status: true, result });
-        } else {
-            res.status(404).end();
+        if (!result._id) {
+            errorCommonResponse(res, `${req.params.id} not found`);
         }
-
+        
+        successResponse(res, result);
     } catch (exception) {
-        res.status(500).json({ status: false, error: exception });
+        errorCommonResponse(res, exception);
     }
 };
 
-const createProduct = async (req, res) => {
+controller.createProduct = async (req, res) => {
     try {
         const { name, price, category, type } = req.body;
-        const avatar = await UploadFile(`uploads/${req.file.filename}`, req.file.filename);
+        const avatar = await UploadImage(`uploads/${req.file.filename}`, req.file.filename);
+
+        if (!avatar) {
+            return errorCommonResponse(res, 'upload failed');
+        }
 
         const data = {
             name,
@@ -60,48 +69,59 @@ const createProduct = async (req, res) => {
 
         const result = await Product.create(data);
 
-        res.json({ status: true, result });
+        if (!result._id) {
+            return errorCommonResponse(res, 'Create failed');
+        }
+
+        successResponse(res, result);
     } catch (exception) {
-        res.status(500).json({ status: false, error: exception });
+        errorCommonResponse(res, exception);
     }
 };
 
-const deleteById = async (req, res) => {
+controller.deleteById = async (req, res) => {
     try {
         const result = await Product.deleteOne({_id: req.params.id});
+
         if (!result.deleteCount) {
-            return res.status(404).json({ status: false, message: 'Deleted fail' });
+            return errorCommonResponse(res, 'Deleted fail');
         }
-        res.status(200).json({ status: true, message: 'Deleted successfully' });
+
+        successResponse(res);
     } catch (exception) {
-        res.status(500).json({ status: false, error: exception });
+        errorCommonResponse(res, exception);
     }
     
 };
 
-const updateById = async (req, res) => {
+controller.updateById = async (req, res) => {
     try {
-        const { name, price, category, type, avatar } = req.body;
-        const data = new Product({
+        const { name, price, category, type } = req.body;
+        const avatar = await UploadImage(`uploads/${req.file.filename}`, req.file.filename);
+
+        if (!avatar) {
+            return errorCommonResponse(res, 'upload failed');
+        }
+
+        const data = {
             name,
             price,
             category,
             type,
             avatar
-        });
+        };
 
         const result = await Product.findByIdAndUpdate(req.params.id, data, { new: true });
-        res.json({ status: true, result });
+
+        if (!result._id) {
+            return errorCommonResponse(res, 'Update failed');
+        }
+
+        successResponse(res, result);
     } catch (exception) {
-        res.status(500).json({ status: false, error: exception });
+        errorCommonResponse(res, exception);
     }
 };
 
-module.exports = {
-    getAll,
-    getById,
-    deleteById,
-    updateById,
-    createProduct
-};
+module.exports = controller;
 

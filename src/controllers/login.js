@@ -1,42 +1,34 @@
-const jwt = require('jsonwebtoken');
-const argon2 = require('argon2');
 const User = require('../models/user');
 const Cart = require('../models/cart');
+const { common } = require('../utils');
+const { compare } = require('../services/bcrypt');
+const { genToken } = require('../services/authentication');
 
 const Login = async (req, res) => {
     const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
     
-    const passwordCorrect = user === null
-        ? false
-        : await argon2.verify(user.password, password);
+    const user = await User.findOne({ email }).lean();
+    const passwordCorrect = await compare(password, user?.password);
 
-    if (!(user && passwordCorrect)) {
-        return res.status(401).json({
-            error: 'invalid email or password'
-        });
+    if (!passwordCorrect) {
+        return common.errorCommonResponse(res, 'invalid email or password');
     }
 
-    let cart = await Cart
-        .findOne({ userId: user._id, type: 'cart' })
-        .select('_id')
-        .lean();
+    let cart = await Cart.findOne({ userId: user._id }).select('_id').lean();
 
-    if (cart) {
-        cart = await Cart.create({ userId: user._id, type: 'cart' });
+    if (!cart) {
+        cart = await Cart.create({ userId: user._id });
     }
 
-    const userForToken = {
-        name: user.name,
-        email: user.email,
-        id: user._id,
-        cartId: cart._id
-    };
-
-    const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: 60*60*24 });
-
-    res.status(200).send({ token, email: user.email, name: user.name });
+    const token = await genToken({ _id: user._id.toString(), cartId: cart._id });
+    
+    // eslint-disable-next-line
+    const { password: _, ...payload } = user;
+    
+    common.successResponse(res, {
+        ...payload,
+        token
+    });
 };
 
 module.exports = {
