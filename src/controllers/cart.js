@@ -35,7 +35,7 @@ controllers.createCart = async (req, res) => {
 
         const cart = await Cart.findById(cartId).select('_id').lean();
         if (!cart) {
-            cartId = (await Cart.create({ userId }))?._id;
+            cartId = ((await Cart.create({ userId })) || {})._id;
         }
 
         const result = await CartItem
