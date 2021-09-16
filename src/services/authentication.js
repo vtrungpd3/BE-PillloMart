@@ -12,7 +12,6 @@ authService.authentication = ({ authKey = 'authorization' } = {}) => {
         if (!token) {
             return common.errorCommonResponse(res, 'token is required');
         }
-
         const isValid = await authService.verifyToken(token);
         if (!isValid) {
             return common.errorCommonResponse(res, 'token is invalid');
@@ -23,7 +22,7 @@ authService.authentication = ({ authKey = 'authorization' } = {}) => {
             return common.errorCommonResponse(res, 'user not exist');
         }
         
-        req.user = {...user, cartId: isValid.cartId };
+        req.user = {...user, cartId: isValid.cartId, orderId: isValid.orderId };
         next();
     };
 };

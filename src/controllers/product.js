@@ -7,7 +7,7 @@ const controller = {};
 
 controller.getAll = async (req, res) => {
     try {
-        let search = {};
+        const search = {};
         const { name, category, type, pageInfo } = req.body;
         const { pageIndex = index.default } = pageInfo || {};
 

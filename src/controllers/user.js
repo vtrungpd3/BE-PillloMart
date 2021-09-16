@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const Cart = require('../models/cart');
+const Order = require('../models/order');
 const { genSalt } = require('../services/bcrypt');
 const { successResponse, errorCommonResponse, validatePassword } = require('../utils').common;
 const UploadImage = require('../services/firebase');
@@ -38,11 +39,16 @@ controllers.createUser = async (req, res) => {
 
         if (!user._id) {
             return errorCommonResponse(res, 'Create user failed');
-        } 
+        }
 
         const cart = await Cart.create({ userId: user._id });
+        const order = await Order.create({ userId: user._id });
 
-        if (!cart._id) {
+        if (!order) {
+            return errorCommonResponse(res, 'Create order failed');
+        }
+
+        if (!cart) {
             return errorCommonResponse(res, 'Create cart failed');
         }
 
