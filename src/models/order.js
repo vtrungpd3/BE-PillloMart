@@ -10,15 +10,7 @@ const orderSchema = new Schema({
     cartItemId: {
         type: [String],
         require: true,
-        ref: 'CartItem'
     },
 }, {timestamps: true, versionKey: false});
-
-orderSchema.virtual('products', {
-    ref: 'CartItem',
-    localField: 'cartItemId',
-    foreignField: '_id',
-    justOne: true,
-});
 
 module.exports = model('Order', orderSchema);

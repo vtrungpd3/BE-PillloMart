@@ -6,10 +6,6 @@ const cartItemSchema = new Schema({
         type: ObjectId,
         require: true,
     },
-    cartId: {
-        type: ObjectId,
-        require: true,
-    },
     quantity: {
         type: Number,
         require: true,

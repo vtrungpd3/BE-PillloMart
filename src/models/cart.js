@@ -7,6 +7,9 @@ const cartSchema = new Schema({
         require: true,
         ref: 'User'
     },
+    cartItemId: {
+        type: [ObjectId],
+    },
     quantity: {
         type: Number,
         require: true,

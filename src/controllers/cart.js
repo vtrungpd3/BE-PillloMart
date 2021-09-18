@@ -14,7 +14,7 @@ controllers.getAllCart = async (req, res) => {
             carts = await Cart.create({ userId });
         }
         
-        const result = await CartItem.find({ cartId: carts._id }).populate('products').lean();
+        const result = await CartItem.find({ _id: { $in: carts.cartItemId }}).populate('products').lean();
         
         successResponse(res, result);
     } catch (exception) {
@@ -38,12 +38,22 @@ controllers.createCart = async (req, res) => {
             cartId = ((await Cart.create({ userId })) || {})._id;
         }
 
-        const result = await CartItem
+        const cartItem = await CartItem
             .findOneAndUpdate(
-                { productId, cartId },
+                { productId },
                 { $set: { quantity, amount: quantity * product.price }},
                 { new: true, upsert: true, setDefaultsOnInsert: true }
             ).lean();
+
+        if (!cartItem) {
+            errorCommonResponse(res, 'Add cart fail');
+        }
+
+        const result = await Cart.findByIdAndUpdate(
+            { _id: cartId },
+            { $push: { cartItemId: cartItem._id }},
+            { new: true, upsert: true, setDefaultsOnInsert: true }
+        ).lean();
 
         successResponse(res, result);
     } catch (exception) {
