@@ -9,6 +9,11 @@ const Login = async (req, res) => {
     const { email, password } = req.body;
     
     const user = await User.findOne({ email }).lean();
+
+    if (!user) {
+        return common.errorCommonResponse(res, 'invalid email or password');
+    }
+
     const passwordCorrect = await compare(password, (user || {}).password);
 
     if (!passwordCorrect) {
