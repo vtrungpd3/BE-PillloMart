@@ -9,9 +9,9 @@ const {
     createUser
 } = require('../controllers/user');
 
-router.post('/', createUser);
 router
-    .route('/:id')
+    .route('/')
+    .post(createUser)
     .get(getById)
     .put(upload, updateById);
 
