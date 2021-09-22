@@ -9,11 +9,12 @@ const controllers = {};
 
 controllers.getById = async (req, res) => {
     try {
-        const result = await User.findById(req.params.id);
+        const { _id: userId } = req.user;
+        const result = await User.findById(userId);
         if (result) {
             successResponse(res, result);
         } else {
-            errorCommonResponse(res, 'id not found');
+            errorCommonResponse(res, 'user not found');
         }
     } catch (exception) {
         errorCommonResponse(res, exception);

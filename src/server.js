@@ -22,7 +22,7 @@ const start = (appConfig, apiConfig) => {
     applyDefaultMiddleware(apiServer, appConfig);
     initAppRoute(apiServer, apiConfig.prefix, authHeaderKey);
 
-    apiServer.listen(port, () => {
+    apiServer.listen(port || 8080, () => {
         console.log('\x1b[36m%s\x1b[0m', '[Server]', '\x1b[0m', `Running on port ${port}`);
     });
 };
