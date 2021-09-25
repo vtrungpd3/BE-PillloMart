@@ -6,7 +6,7 @@ const { common } = require('../utils');
 const controllers = {};
 
 const storage = multer.diskStorage({
-    destination: rootPath,
+    destination: rootPath || './uploads',
     filename: function (req, file, cb) {
         cb(null, Date.now() + path.extname(file.originalname));
     },
