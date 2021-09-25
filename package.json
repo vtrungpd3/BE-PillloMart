@@ -25,7 +25,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "cross-env NODE_ENV=test jest --watch",
+    "test": "cross-env NODE_ENV=test jest --watchAll",
     "lint": "eslint ."
   },
   "jest": {
