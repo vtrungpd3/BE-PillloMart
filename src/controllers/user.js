@@ -33,12 +33,16 @@ controllers.createUser = async (req, res) => {
         }
 
         const hash = await genSalt(password);
+
+        if (!hash) {
+            return errorCommonResponse(res, 'Create user fail');
+        }
+
         const data = {
             name,
             email,
             password: hash,
         };
-        
         const user = await User.create(data);
 
         if (!user._id) {

@@ -16,15 +16,19 @@ const applyDefaultMiddleware = (server, appConfig) => {
 };
 
 const start = (appConfig, apiConfig) => {
-    const { port, authHeaderKey } = appConfig;
+    const { port, authHeaderKey } = appConfig || {};
     const apiServer = express();
     
     applyDefaultMiddleware(apiServer, appConfig);
     initAppRoute(apiServer, apiConfig.prefix, authHeaderKey);
 
-    apiServer.listen(port || 8080, () => {
-        console.log('\x1b[36m%s\x1b[0m', '[Server]', '\x1b[0m', `Running on port ${port}`);
-    });
+    if (process.env.NODE_ENV !== 'test') {
+        apiServer.listen(port, () => {
+            console.log('\x1b[36m%s\x1b[0m', '[Server]', '\x1b[0m', `Running on port ${port}`);
+        });
+    }
+
+    return apiServer;
 };
 
 module.exports = {

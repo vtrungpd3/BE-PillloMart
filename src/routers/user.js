@@ -6,12 +6,10 @@ const { upload } = require('../controllers/image');
 const {
     getById,
     updateById,
-    createUser
 } = require('../controllers/user');
 
 router
     .route('/')
-    .post(createUser)
     .get(getById)
     .put(upload, updateById);
 

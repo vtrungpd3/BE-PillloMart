@@ -28,6 +28,13 @@
     "test": "cross-env NODE_ENV=test jest --watch",
     "lint": "eslint ."
   },
+  "jest": {
+    "testEnvironment": "node",
+    "verbose": true,
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vtrungpd3/BE-PillloMart.git"
