@@ -1,20 +1,26 @@
-/*global describe beforeEach test expect*/
+/*global describe beforeAll test expect*/
 /*eslint no-undef: "error"*/
 
-const { api, mongo } = require('./common');
+const { api } = require('./common');
+const User = require('../models/user');
 
 describe('POST /api/register', () => {
-    beforeEach(() => {
-        mongo();
+    beforeAll( async () => {
+        await User.findOneAndDelete({ email: 'trungpham1998@gmail.com' });
     });
 
     test('create user -> success: True', async () => {
-        const res = await api.post('/api/register').send({ name: 'TrungPham',  email: 'trungpham1998@gmail.com', password: 'Trungpham@123' });
-        expect(res).toBe(true);
+        const { body: { success }} = await api.post('/api/register').send({ name: 'TrungPham', email: 'trungpham1998@gmail.com', password: 'Trungpham@123' });
+        expect(success).toBe(true);
     });
 
-    test('create user duplicate -> success: False', async () => {
+    test('duplicate user -> success: False', async () => {
         const { body: { success }} = await api.post('/api/register').send({ name: 'TrungPham', email: 'trungpham1998@gmail.com', password: 'Trungpham@123' });
+        expect(success).toBe(false);
+    });
+
+    test('password not strong -> success: False', async () => {
+        const { body: { success }} = await api.post('/api/register').send({ name: 'TrungPham', email: 'trungpham19981@gmail.com', password: 'Trungpham' });
         expect(success).toBe(false);
     });
 });

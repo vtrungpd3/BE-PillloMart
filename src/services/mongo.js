@@ -18,5 +18,6 @@ const connect = async (mongoConfig) => {
 };
 
 module.exports = {
-    connect
+    connect,
+    mongoose
 };
