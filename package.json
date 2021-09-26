@@ -18,30 +18,22 @@
   "devDependencies": {
     "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
-    "husky": "^7.0.2",
+    "ghooks": "^2.0.4",
     "jest": "^27.0.6",
-    "lint-staged": "^11.1.2",
     "nodemon": "^2.0.12",
     "supertest": "^6.1.5"
   },
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "cross-env NODE_ENV=test jest --watchAll",
+    "test": "cross-env NODE_ENV=test jest",
     "lint": "eslint .",
     "fix": "eslint --fix ./src/"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "CI=true npm run test"
+  "config": {
+    "ghooks": {
+      "prev-commit": "npm run test"
     }
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "git add"
-    ]
   },
   "jest": {
     "testEnvironment": "node",
