@@ -52,24 +52,18 @@ controller.getById = async (req, res) => {
 
 controller.createProduct = async (req, res) => {
     try {
-        const { name, price, category, type } = req.body;
-        const avatar = await UploadImage(`uploads/${req.file.filename}`, req.file.filename);
+        const dataReq = req.body;
 
-        if (!avatar) {
-            return errorCommonResponse(res, 'upload failed');
+        if (!dataReq.avatar) {
+            const url = await UploadImage(`uploads/${dataReq.avatar}`, dataReq.avatar);
+            if (!url) {
+                return errorCommonResponse(res, 'upload failed');
+            }
+            dataReq.avatar = url;
         }
+        const result = await Product.create(dataReq);
 
-        const data = {
-            name,
-            price,
-            category,
-            type,
-            avatar
-        };
-
-        const result = await Product.create(data);
-
-        if (!result._id) {
+        if (!result) {
             return errorCommonResponse(res, 'Create failed');
         }
 
@@ -81,9 +75,9 @@ controller.createProduct = async (req, res) => {
 
 controller.deleteById = async (req, res) => {
     try {
-        const result = await Product.deleteOne({_id: req.params.id});
+        const { deleteCount } = await Product.deleteOne({_id: req.params.id});
 
-        if (!result.deleteCount) {
+        if (!deleteCount) {
             return errorCommonResponse(res, 'Deleted fail');
         }
 
@@ -96,22 +90,16 @@ controller.deleteById = async (req, res) => {
 
 controller.updateById = async (req, res) => {
     try {
-        const { name, price, category, type } = req.body;
-        const avatar = await UploadImage(`uploads/${req.file.filename}`, req.file.filename);
+        const dataReq = req.body || {};
 
-        if (!avatar) {
-            return errorCommonResponse(res, 'upload failed');
+        if (!dataReq.avatar) {
+            const url = await UploadImage(`uploads/${dataReq.avatar}`, dataReq.avatar);
+            if (!url) {
+                return errorCommonResponse(res, 'upload failed');
+            }
+            dataReq.avatar = url;
         }
-
-        const data = {
-            name,
-            price,
-            category,
-            type,
-            avatar
-        };
-
-        const result = await Product.findByIdAndUpdate(req.params.id, data, { new: true });
+        const result = await Product.findByIdAndUpdate(req.params.id, dataReq, { new: true });
 
         if (!result._id) {
             return errorCommonResponse(res, 'Update failed');

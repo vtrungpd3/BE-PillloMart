@@ -71,15 +71,15 @@ controllers.updateById = async (req, res) => {
         const dataReq = req.body;
         const { _id: userId } = req.user;
 
-        if (req.file.filename) {
-            dataReq.avatar = await UploadImage(`uploads/${req.file.filename}`, req.file.filename);
+        if (dataReq.avatar) {
+            const avatar = await UploadImage(`uploads/${dataReq.avatar}`, dataReq.avatar);
+            if (!avatar) {
+                return errorCommonResponse(res, 'Upload avatar User failed');
+            }
+            dataReq.avatar = avatar;
         }
 
-        if (!dataReq.avatar && req.file.filename) {
-            return errorCommonResponse(res, 'Upload avatar User failed');
-        }
-
-        const result = await User.findByIdAndUpdate(userId, { ...dataReq }, { new: true }).lean();
+        const result = await User.findByIdAndUpdate(userId, { ...dataReq }, { new: true, runValidators: true }).lean();
 
         if (!result._id) {
             return errorCommonResponse(res, 'Update user failed');

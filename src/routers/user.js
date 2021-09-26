@@ -1,7 +1,6 @@
 // === Route User ===
 const express = require('express');
 const router = express.Router();
-const { upload } = require('../controllers/image');
 
 const {
     getById,
@@ -11,6 +10,6 @@ const {
 router
     .route('/')
     .get(getById)
-    .put(upload, updateById);
+    .put(updateById);
 
 module.exports = router;

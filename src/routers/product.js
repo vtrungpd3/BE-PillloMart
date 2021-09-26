@@ -1,7 +1,6 @@
 // === Route Product ===
 const express = require('express');
 const router = express.Router();
-const { upload } = require('../controllers/image');
 
 const {
     getAll,
@@ -12,7 +11,7 @@ const {
 } = require('../controllers/product');
 
 router.post('/s', getAll);
-router.post('/', upload, createProduct);
+router.post('/', createProduct);
 router
     .route('/:id')
     .get(getById)

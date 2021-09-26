@@ -7,20 +7,57 @@ describe('POST /api/user', () => {
     let token = '';
 
     beforeAll( async () => {
-        const { body: { data }} = await api.post('/api/login').send({ email: 'trungpham123@gmail.com', password: 'Trungpham@123' });
+        const { body: { data }} =
+            await api
+                .post('/api/login')
+                .send({
+                    email: 'trungpham123@gmail.com',
+                    password: 'Trungpham@123'
+                });
+
         token = data.token;
     });
 
     test('get user by token -> success: True', async () => {
-        const { body: { success } } = await api.get('/api/user').set('Authorization', `${token}`);
-        expect(success).toBe(true);
+        const { body: { success } } =
+            await api
+                .get('/api/user')
+                .set('Authorization', `${token}`);
+
+        expect(success).toBeTruthy();
     });
 
-    test('update user -> success: True', async () => {
-        const { body: { success } } = await api.get('/api/user')
-            .set('Authorization', `${token}`)
-            .send({ name: 'trungpham123' });
+    test('get user by token error -> success: False', async () => {
+        const { body: { success } } =
+            await api
+                .get('/api/user')
+                .set('Authorization', `${token}123`);
 
-        expect(success).toBe(true);
+        expect(success).toBeFalsy();
+    });
+
+    test('update name for user -> success: True', async () => {
+        const { body: { success } } =
+            await api
+                .put('/api/user')
+                .set('Authorization', `${token}`)
+                .send({
+                    name: 'Trungpham@123',
+                    avatar: '1632573325002.png'
+                });
+
+        expect(success).toBeTruthy();
+    });
+
+    test('update name error -> success: False', async () => {
+        const { body: { success } } =
+            await api
+                .put('/api/user')
+                .set('Authorization', `${token}`)
+                .send({
+                    name: '1213',
+                });
+
+        expect(success).toBeFalsy();
     });
 });

@@ -18,7 +18,7 @@ const uploadImage = async (path, filename) => {
         }
     });
 
-    if (!data[0].metadata.mediaLink) {
+    if (!data[0]?.metadata?.mediaLink) {
         return null;
     }
 

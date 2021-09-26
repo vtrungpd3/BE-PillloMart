@@ -4,8 +4,9 @@ const { validateEmail } = require('../utils/common');
 const userSchema = new Schema({
     name: {
         type: String,
-        require: true,
-        minLength: 5
+        trim: true,
+        required: true,
+        minLength: 6
     },
     avatar: {
         type: String,
@@ -22,6 +23,6 @@ const userSchema = new Schema({
         type: String,
         require: true,
     },
-}, {timestamps: true, versionKey: false});
+}, { timestamps: true, versionKey: false });
 
 module.exports = model('User', userSchema);
