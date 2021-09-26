@@ -22,6 +22,9 @@ controllers.getAllOrder = async (req, res) => {
 };
 
 controllers.createOrder = async (req, res) => {
+    /**
+     * TODO: Update Price of order
+     */
     try {
         const { _id: userId, orderId, cartId } = req.user;
         const { itemsCart } = req.body;

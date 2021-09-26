@@ -32,7 +32,7 @@
   },
   "config": {
     "ghooks": {
-      "prev-commit": "npm run test && npm run fix"
+      "prev-commit": "npm run fix && npm run test"
     }
   },
   "jest": {
