@@ -20,6 +20,7 @@
     "eslint": "^7.32.0",
     "husky": "^7.0.2",
     "jest": "^27.0.6",
+    "lint-staged": "^11.1.2",
     "nodemon": "^2.0.12",
     "supertest": "^6.1.5"
   },
@@ -27,12 +28,20 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "cross-env NODE_ENV=test jest --watchAll",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "fix": "eslint --fix ./src/"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "CI=true npm run test"
+      "pre-commit": "lint-staged",
+      "pre-push": "CI=true npm run test"
     }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
   },
   "jest": {
     "testEnvironment": "node",
