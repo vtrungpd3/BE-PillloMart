@@ -63,18 +63,27 @@ controllers.createCart = async (req, res) => {
 
 controllers.updateById = async (req, res) => {
     try {
-        const { quantity, cartId } = req.body || {};
-        const cart = await CartItem.findByIdAndUpdate(
-            { cartId },
-            { $set: { quantity } },
-            { new: true, upsert: true, setDefaultsOnInsert: true }
-        );
+        const { quantity, price } = req.body || {};
 
-        if (!cart) {
-            errorCommonResponse(res, 'Update fail');
+        if (!price) {
+            errorCommonResponse(res, 'price is require');
         }
 
-        successResponse(res);
+        if (!quantity) {
+            errorCommonResponse(res, 'quantity is require');
+        }
+
+        const cart = await CartItem.findOneAndUpdate(
+            { _id: req.params.id },
+            { $set: { quantity, amount: quantity * price }},
+            { new: true, upsert: true, setDefaultsOnInsert: true }
+        ).populate('products').lean();
+
+        if (!cart) {
+            errorCommonResponse(res, 'Update cart fail');
+        }
+
+        successResponse(res, cart);
     } catch (exception) {
         errorCommonResponse(res, exception);
     }
