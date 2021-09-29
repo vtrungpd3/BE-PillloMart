@@ -61,6 +61,24 @@ controllers.createCart = async (req, res) => {
     }
 };
 
+controllers.updateById = async (req, res) => {
+    try {
+        const { quantity, cartId } = req.body || {};
+        const cart = await CartItem.findByIdAndUpdate(
+            { cartId },
+            { $set: { quantity } },
+            { new: true, upsert: true, setDefaultsOnInsert: true }
+        );
+
+        if (!cart) {
+            errorCommonResponse(res, 'Update fail');
+        }
+
+        successResponse(res);
+    } catch (exception) {
+        errorCommonResponse(res, exception);
+    }
+};
 
 controllers.deleteById = async (req, res) => {
     try {

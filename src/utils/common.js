@@ -10,6 +10,11 @@ common.validatePassword = (password) => {
     return regexPassword.test(password);
 };
 
+common.validatePhoneNumber = (phone) => {
+    const regexPassword = new RegExp(/^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/);
+    return regexPassword.test(phone);
+};
+
 common.successResponse = (res, data, payload) => {
     res.status(200).json({
         success: true,

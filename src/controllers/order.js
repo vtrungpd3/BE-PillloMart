@@ -1,4 +1,5 @@
 const Order = require('../models/order');
+const OrderItem = require('../models/orderItem');
 const Cart = require('../models/cart');
 const CartItem = require('../models/cartItem');
 const { successResponse, errorCommonResponse } = require('../utils').common;
@@ -43,7 +44,7 @@ controllers.createOrder = async (req, res) => {
         if (!result) {
             errorCommonResponse(res, 'create order fail');
         }
-
+        OrderItem
         const cart = await Cart
             .findByIdAndUpdate(
                 { _id: cartId },

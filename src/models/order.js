@@ -7,10 +7,6 @@ const orderSchema = new Schema({
         require: true,
         ref: 'User'
     },
-    cartItemId: {
-        type: [String],
-        require: true,
-    },
 }, {timestamps: true, versionKey: false});
 
 module.exports = model('Order', orderSchema);
