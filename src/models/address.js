@@ -23,6 +23,9 @@ const addressSchema = new Schema({
         required: 'Address is required',
         minLength: 10
     },
+    defaultAddress: {
+        type: Boolean,
+    }
 }, { timestamps: true, versionKey: false });
 
 module.exports = model('Address', addressSchema);

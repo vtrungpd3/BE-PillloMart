@@ -24,7 +24,15 @@ controllers.createAddress = async (req, res) => {
         const dateReq = req.body;
         const { _id: userId } = req.user;
 
-        const address = await Address.create({ ...dateReq, userId }, { runValidators: true });
+		let defaultAddress = false;
+
+	    const listAddress = await Address.find({ userId });
+
+		if (!listAddress.length) {
+			defaultAddress = true;
+		}
+
+	    const address = await Address.create({ ...dateReq, userId, defaultAddress });
 
         if (address) {
             successResponse(res, address);
@@ -54,6 +62,37 @@ controllers.updateAddress = async (req, res) => {
     } catch (exception) {
         errorCommonResponse(res, exception);
     }
+};
+
+controllers.updateDefaultAddress = async (req, res) => {
+	try {
+		const { id: addressId } = req.body;
+		const { _id: userId } = req.user;
+
+		const resetAddress = await Address.updateMany(
+			{ userId },
+			{ $set: { defaultAddress: false }},
+			{ multi: true }
+		);
+
+		if (!resetAddress) {
+			errorCommonResponse(res, 'update address fail');
+		}
+
+		const address = await Address.findOneAndUpdate(
+			{ _id: addressId },
+			{ $set: { defaultAddress: true }},
+			{ new: true, runValidators: true }
+		);
+
+		if (address) {
+			successResponse(res, address);
+		} else {
+			errorCommonResponse(res, 'update address fail');
+		}
+	} catch (exception) {
+		errorCommonResponse(res, exception);
+	}
 };
 
 controllers.deleteAddress = async (req, res) => {

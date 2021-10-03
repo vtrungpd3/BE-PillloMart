@@ -7,9 +7,11 @@ const {
     getAllAddress,
     deleteAddress,
     updateAddress,
+    updateDefaultAddress,
 } = require('../controllers/address');
 
 router.get('/s', getAllAddress);
+router.post('/default', updateDefaultAddress);
 router
     .route('/')
     .post(createAddress)
