@@ -11,8 +11,8 @@ common.validatePassword = (password) => {
 };
 
 common.validatePhoneNumber = (phone) => {
-    const regexPassword = new RegExp(/^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/);
-    return regexPassword.test(phone);
+    const regexPhone = new RegExp(/((^(\+84|84|0|0084){1})(3|5|7|8|9))+([0-9]{8})$/);
+    return regexPhone.test(phone);
 };
 
 common.successResponse = (res, data, payload) => {

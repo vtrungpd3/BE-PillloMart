@@ -2,6 +2,7 @@ const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
 const Cart = require('../models/cart');
 const CartItem = require('../models/cartItem');
+const Address = require('../models/address');
 const { successResponse, errorCommonResponse } = require('../utils').common;
 
 const controllers = {};
@@ -23,28 +24,22 @@ controllers.getAllOrder = async (req, res) => {
 };
 
 controllers.createOrder = async (req, res) => {
-    /**
-     * TODO: Update Price of order
-     */
     try {
-        const { _id: userId, orderId, cartId } = req.user;
-        const { itemsCart } = req.body;
+        const { _id: userId, cartId } = req.user;
+        const { itemsCart, info } = req.body;
 
-        let orders = await Order.findById(orderId);
+        const dataCart = await CartItem.find({ _id: { $in: itemsCart }}).populate('products').lean();
+        const dataProduct = (dataCart || []).map((item) => ({
+            name: item.products.name,
+            price: item.products.price,
+            quantity: item.quantity,
+        }));
 
-        if (!orders) {
-            orders = await Order.create({ userId });
-        }
 
-        const result = await Order.findByIdAndUpdate(
-            { _id: orders._id },
-            { $set: { cartItemId: itemsCart }},
-            { new: true, upsert: true, setDefaultsOnInsert: true });
+        const dataAddress = await Address.findById(info).lean();
 
-        if (!result) {
-            errorCommonResponse(res, 'create order fail');
-        }
-        OrderItem
+        const dataOrder = await Order.create({ ...dataProduct, ...dataAddress });
+
         const cart = await Cart
             .findByIdAndUpdate(
                 { _id: cartId },
@@ -55,7 +50,7 @@ controllers.createOrder = async (req, res) => {
             errorCommonResponse(res, 'remove cart fail');
         }
 
-        successResponse(res, result);
+        successResponse(res, dataOrder);
     } catch (exception) {
         errorCommonResponse(res, exception);
     }

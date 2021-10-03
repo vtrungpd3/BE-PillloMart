@@ -21,5 +21,4 @@ const cartSchema = new Schema({
     }
 }, {timestamps: true, versionKey: false});
 
-
 module.exports = model('Cart', cartSchema);

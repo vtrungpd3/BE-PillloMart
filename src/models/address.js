@@ -14,7 +14,7 @@ const addressSchema = new Schema({
         minLength: 6
     },
     phone: {
-        type: Number,
+        type: String,
         required: 'Phone is required',
         validate: [validatePhoneNumber, 'Please fill a valid Phone Number'],
     },
