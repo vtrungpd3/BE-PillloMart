@@ -1,5 +1,6 @@
 const { Schema, model } = require('mongoose');
 const { validateEmail } = require('../utils/common');
+const { ObjectId } = Schema.Types;
 
 const userSchema = new Schema({
     name: {
@@ -23,6 +24,16 @@ const userSchema = new Schema({
         type: String,
         require: true,
     },
+    addressId: {
+        type: ObjectId,
+    }
 }, { timestamps: true, versionKey: false });
+
+userSchema.virtual('address', {
+    ref: 'Address',
+    localField: 'addressId',
+    foreignField: '_id',
+    justOne: true,
+});
 
 module.exports = model('User', userSchema);

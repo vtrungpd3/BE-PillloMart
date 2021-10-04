@@ -10,7 +10,7 @@ const controllers = {};
 controllers.getById = async (req, res) => {
     try {
         const { _id: userId } = req.user;
-        const result = await User.findById(userId).lean();
+        const result = await User.findById(userId).populate('address').lean();
 
         if (result) {
             // eslint-disable-next-line

@@ -1,4 +1,5 @@
 const Address = require('../models/address');
+const User = require('../models/user');
 const { successResponse, errorCommonResponse } = require('../utils').common;
 
 const controllers = {};
@@ -84,6 +85,15 @@ controllers.updateDefaultAddress = async (req, res) => {
 			{ $set: { defaultAddress: true }},
 			{ new: true, runValidators: true }
 		);
+
+		const updateUser = await User.findByIdAndUpdate(
+			{ _id: userId },
+			{ $set: { addressId }}
+		);
+
+		if (!updateUser) {
+			return errorCommonResponse(res, 'update address user default fail');
+		}
 
 		if (address) {
 			successResponse(res, address);
