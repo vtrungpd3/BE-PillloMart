@@ -8,10 +8,15 @@ const controllers = {};
 controllers.getAllCart = async (req, res) => {
     try {
         const { _id: userId, cartId } = req.user;
+        const { cartItemId } = req.body;
         let carts = await Cart.findById(cartId);
 
         if (!carts) {
             carts = await Cart.create({ userId });
+        }
+
+        if (!!(cartItemId || []).length) {
+            carts.cartItemId = cartItemId;
         }
         
         const result = await CartItem.find({ _id: { $in: carts.cartItemId }}).populate('products').lean();

@@ -9,7 +9,7 @@ const {
     updateById
 } = require('../controllers/cart');
 
-router.get('/s', getAllCart);
+router.post('/s', getAllCart);
 router.post('/', createCart);
 router.delete('/:id', deleteById);
 router.put('/:id', updateById);
