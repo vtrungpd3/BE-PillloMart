@@ -15,12 +15,13 @@ controllers.getAllCart = async (req, res) => {
             carts = await Cart.create({ userId });
         }
 
+        let result = {};
         if (!!(cartItemId || []).length) {
-            carts.cartItemId = cartItemId;
+            result = await CartItem.find({ _id: { $in: cartItemId }}).populate('products').lean();
+        } else {
+            result = await CartItem.find({ cartId: carts._id }).populate('products').lean();
         }
-        
-        const result = await CartItem.find({ _id: { $in: carts.cartItemId }}).populate('products').lean();
-        
+
         successResponse(res, result);
     } catch (exception) {
         errorCommonResponse(res, exception);
@@ -43,22 +44,22 @@ controllers.createCart = async (req, res) => {
             cartId = ((await Cart.create({ userId })) || {})._id;
         }
 
-        const cartItem = await CartItem
-            .findOneAndUpdate(
-                { productId },
-                { $set: { quantity, amount: quantity * product.price }},
-                { new: true, upsert: true, setDefaultsOnInsert: true }
-            ).lean();
+        const cartItem = await CartItem.findOne({ productId }).lean();
 
-        if (!cartItem) {
-            errorCommonResponse(res, 'Add cart fail');
+        let result = {};
+        if (cartItem) {
+            result = await CartItem.findOneAndUpdate(
+                { _id: cartItem._id },
+                { $set: { quantity: cartItem.quantity + 1, amount: (cartItem.quantity + 1) * product.price }},
+                { new: true, upsert: true, setDefaultsOnInsert: true }
+            )
+        } else {
+            result = await CartItem.create({ productId, quantity, amount: quantity * product.price, cartId });
         }
 
-        const result = await Cart.findByIdAndUpdate(
-            { _id: cartId },
-            { $push: { cartItemId: cartItem._id }},
-            { new: true, upsert: true, setDefaultsOnInsert: true }
-        ).lean();
+        if (!result) {
+            errorCommonResponse(res, 'Add cart fail');
+        }
 
         successResponse(res, result);
     } catch (exception) {

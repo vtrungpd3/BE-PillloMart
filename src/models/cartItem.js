@@ -2,6 +2,10 @@ const { Schema, model } = require('mongoose');
 const { ObjectId } = Schema.Types;
 
 const cartItemSchema = new Schema({
+    cartId: {
+        type: ObjectId,
+        require: true,
+    },
     productId: {
         type: ObjectId,
         require: true,

@@ -37,7 +37,6 @@ const orderItemSchema = new Schema({
     phone: {
         type: Number,
         required: 'Phone is required',
-        validate: [validatePhoneNumber, 'Please fill a valid Phone Number'],
     },
     address: {
         type: String,

@@ -16,7 +16,7 @@ controllers.getAllOrder = async (req, res) => {
             orders = await Order.create({ userId });
         }
         
-        const result = await CartItem.find({ _id: { $in: orders.cartItemId }}).populate('products').lean();
+        const result = await OrderItem.find({ orderId: orders._id }).lean();
         successResponse(res, result);
     } catch (exception) {
         errorCommonResponse(res, exception);
@@ -25,32 +25,31 @@ controllers.getAllOrder = async (req, res) => {
 
 controllers.createOrder = async (req, res) => {
     try {
-        const { _id: userId, cartId } = req.user;
+        const { _id: userId, orderId, cartId } = req.user;
         const { itemsCart, info } = req.body;
 
         const dataCart = await CartItem.find({ _id: { $in: itemsCart }}).populate('products').lean();
-        const dataProduct = (dataCart || []).map((item) => ({
-            name: item.products.name,
-            price: item.products.price,
-            quantity: item.quantity,
-        }));
+        const dataAddress = await Address.findById(info).select('name phone address -_id').lean();
 
+        const dataProduct = (dataCart || []).map(async (item) => {
+            const data = {
+                name: item.products.name,
+                price: item.products.price,
+                quantity: item.quantity,
+                avatar: item.products.avatar,
+                amount: item.amount,
+            };
+            return await OrderItem.create({...data, ...dataAddress, orderId});
+        });
 
-        const dataAddress = await Address.findById(info).lean();
-
-        const dataOrder = await Order.create({ ...dataProduct, ...dataAddress });
-
-        const cart = await Cart
-            .findByIdAndUpdate(
-                { _id: cartId },
-                { $pull: { cartItemId: { $in: itemsCart }}},
-            ).lean();
+        const result = await Promise.all(dataProduct);
+        const cart = await CartItem.deleteMany({ _id: { $in: itemsCart }}).lean();
 
         if (!cart) {
             errorCommonResponse(res, 'remove cart fail');
         }
 
-        successResponse(res, dataOrder);
+        successResponse(res, result);
     } catch (exception) {
         errorCommonResponse(res, exception);
     }
