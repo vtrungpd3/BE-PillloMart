@@ -49,12 +49,12 @@ controllers.createOrder = async (req, res) => {
             amount: item.amount,
         }));
 
-        const createProduct = await OrderProduct.insertMany(dataProduct);
+        const createProduct = await OrderProduct.create(dataProduct);
         const createAddress = await OrderAddress.create(dataAddress);
         const productId = createProduct.map(product => product._id);
         const total = createProduct.reduce((sum, product) => sum + product?.amount, 0);
 
-        if (!createProduct || !createAddress) {
+        if (!createProduct || !createAddress || !productId.length) {
             return errorCommonResponse(res, 'order fail');
         }
 
@@ -65,7 +65,7 @@ controllers.createOrder = async (req, res) => {
 
         const cart = await CartItem.deleteMany({ _id: { $in: itemsCart }}).lean();
         if (!cart) {
-            return errorCommonResponse(res, 'remove cart fail');
+            return errorCommonResponse(res, 'remove carts fail');
         }
 
         successResponse(res, result);
