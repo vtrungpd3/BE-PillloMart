@@ -16,7 +16,7 @@ controllers.getAllCart = async (req, res) => {
         }
 
         let result = {};
-        if (!!(cartItemId || []).length) {
+        if ((cartItemId || []).length) {
             result = await CartItem.find({ _id: { $in: cartItemId }}).populate('products').lean();
         } else {
             result = await CartItem.find({ cartId: carts._id }).populate('products').lean();
@@ -52,7 +52,7 @@ controllers.createCart = async (req, res) => {
                 { _id: cartItem._id },
                 { $set: { quantity: cartItem.quantity + 1, amount: (cartItem.quantity + 1) * product.price }},
                 { new: true, upsert: true, setDefaultsOnInsert: true }
-            )
+            );
         } else {
             result = await CartItem.create({ productId, quantity, amount: quantity * product.price, cartId });
         }

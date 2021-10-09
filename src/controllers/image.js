@@ -1,6 +1,6 @@
 const path = require('path');
 const multer = require('multer');
-const { rootPath, limit, bodyField, mimeGroup } = require('../config').storage;
+const { limit, bodyField, mimeGroup } = require('../config').storage;
 const { common } = require('../utils');
 
 const controllers = {};

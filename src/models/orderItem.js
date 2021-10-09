@@ -1,5 +1,4 @@
 const { Schema, model } = require('mongoose');
-const { validatePhoneNumber } = require('../utils/common');
 const { ObjectId } = Schema.Types;
 
 const orderItemSchema = new Schema({
@@ -7,45 +6,35 @@ const orderItemSchema = new Schema({
         type: ObjectId,
         required: true,
     },
-    productName: {
-        type: String,
-        require: true,
-        minLength: 5
-    },
-    avatar: {
-        type: String,
-        require: true
-    },
-    price: {
-        type: Number,
-        require: true
-    },
-    quantity: {
-        type: Number,
-        require: true,
-    },
-    amount: {
-        type: Number,
+    productId: {
+        type: [ObjectId],
         required: true,
     },
-    name: {
-        type: String,
-        trim: true,
+    receiverId: {
+        type: ObjectId,
         required: true,
-        minLength: 6
     },
-    phone: {
+    total: {
         type: Number,
-        required: 'Phone is required',
-    },
-    address: {
-        type: String,
-        required: 'Address is required',
-        minLength: 10
+        required: true,
     },
 }, {
     timestamps: true,
     versionKey: false,
+});
+
+orderItemSchema.virtual('productItems', {
+    ref: 'OrderProduct',
+    localField: 'productId',
+    foreignField: '_id',
+    justOne: true,
+});
+
+orderItemSchema.virtual('receiver', {
+    ref: 'OrderAddress',
+    localField: 'receiverId',
+    foreignField: '_id',
+    justOne: true,
 });
 
 module.exports = model('OrderItem', orderItemSchema);
