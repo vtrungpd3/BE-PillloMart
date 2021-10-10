@@ -27,7 +27,6 @@ orderItemSchema.virtual('productItems', {
     ref: 'OrderProduct',
     localField: 'productId',
     foreignField: '_id',
-    justOne: true,
 });
 
 orderItemSchema.virtual('receiver', {

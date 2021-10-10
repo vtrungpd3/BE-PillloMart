@@ -35,10 +35,22 @@ controllers.createOrder = async (req, res) => {
         const { itemsCart, info } = req.body;
 
         const dataCart = await CartItem.find({ _id: { $in: itemsCart }}).populate('products').lean();
-        const dataAddress = await Address.findById(info).select('name phone address -_id').lean();
+        let { _id: addressId, ...payloadAddress } = await Address
+            .findById(info)
+            .select('name phone address _id')
+            .lean();
 
-        if (!dataCart || !dataAddress) {
+        if (!dataCart || !addressId) {
             return errorCommonResponse(res, 'order fail');
+        }
+
+        let { _id: OrderAddressId, ...payloadOrderAddress } = await OrderAddress
+            .findOne({ addressId: info })
+            .select('name phone address')
+            .lean();
+
+        if (JSON.stringify({...payloadAddress}) !== JSON.stringify({...payloadOrderAddress})) {
+            OrderAddressId = (await OrderAddress.create({ ...payloadAddress, addressId }))?._id;
         }
 
         const dataProduct = (dataCart || []).map((item) => ({
@@ -50,15 +62,14 @@ controllers.createOrder = async (req, res) => {
         }));
 
         const createProduct = await OrderProduct.create(dataProduct);
-        const createAddress = await OrderAddress.create(dataAddress);
         const productId = createProduct.map(product => product._id);
         const total = createProduct.reduce((sum, product) => sum + product?.amount, 0);
 
-        if (!createProduct || !createAddress || !productId.length) {
+        if (!createProduct || !addressId || !productId.length) {
             return errorCommonResponse(res, 'order fail');
         }
 
-        const result = await OrderItem.create({ total, productId, receiverId: createAddress._id, orderId });
+        const result = await OrderItem.create({ total, productId, receiverId: OrderAddressId, orderId });
         if (!result) {
             return errorCommonResponse(res, 'order fail');
         }

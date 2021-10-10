@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const { ObjectId } = Schema.Types;
 
 const orderAddressSchema = new Schema({
     name: {
@@ -16,6 +17,10 @@ const orderAddressSchema = new Schema({
         required: 'Address is required',
         minLength: 10
     },
+    addressId: {
+        type: ObjectId,
+        required: true
+    }
 }, {
     timestamps: true,
     versionKey: false,
