@@ -39,17 +39,18 @@ controllers.createOrder = async (req, res) => {
             .findById(info)
             .select('name phone address _id')
             .lean();
-
         if (!dataCart || !addressId) {
             return errorCommonResponse(res, 'order fail');
         }
 
-        let { _id: OrderAddressId, ...payloadOrderAddress } = await OrderAddress
+        const orderAddress = await OrderAddress
             .findOne({ addressId: info })
-            .select('name phone address')
+            .select('name phone address _id')
             .lean();
 
-        if (JSON.stringify({...payloadAddress}) !== JSON.stringify({...payloadOrderAddress})) {
+        let { _id: OrderAddressId, ...payloadOrderAddress } = orderAddress || {};
+
+        if (JSON.stringify({...payloadAddress}) !== JSON.stringify({...payloadOrderAddress}) || !OrderAddressId) {
             OrderAddressId = (await OrderAddress.create({ ...payloadAddress, addressId }))?._id;
         }
 
@@ -73,7 +74,6 @@ controllers.createOrder = async (req, res) => {
         if (!result) {
             return errorCommonResponse(res, 'order fail');
         }
-
         const cart = await CartItem.deleteMany({ _id: { $in: itemsCart }}).lean();
         if (!cart) {
             return errorCommonResponse(res, 'remove carts fail');
