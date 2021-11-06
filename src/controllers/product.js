@@ -61,6 +61,7 @@ controller.createProduct = async (req, res) => {
             }
             dataReq.avatar = url;
         }
+        // TODO: Change Mongoose -> MongoDB for Validators
         const result = await Product.create(dataReq);
 
         if (!result) {
@@ -75,9 +76,9 @@ controller.createProduct = async (req, res) => {
 
 controller.deleteById = async (req, res) => {
     try {
-        const { deleteCount } = await Product.deleteOne({_id: req.params.id});
+        const { deletedCount } = await Product.deleteOne({_id: req.params.id});
 
-        if (!deleteCount) {
+        if (!deletedCount) {
             return errorCommonResponse(res, 'Deleted fail');
         }
 
@@ -99,7 +100,7 @@ controller.updateById = async (req, res) => {
             }
             dataReq.avatar = url;
         }
-        const result = await Product.findByIdAndUpdate(req.params.id, dataReq, { new: true });
+        const result = await Product.findByIdAndUpdate(req.params.id, dataReq, { new: true, runValidators: true });
 
         if (!result._id) {
             return errorCommonResponse(res, 'Update failed');

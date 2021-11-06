@@ -6,6 +6,7 @@ const cart = require('./cart');
 const order = require('./order');
 const register = require('./register');
 const address = require('./address');
+const todo = require('./todo');
 
 const authService = require('../services/authentication');
 
@@ -14,6 +15,7 @@ const initAppRoute = (server, prefix, authHeaderKey) => {
     server.use(`${prefix}/upload`, image);
     server.use(`${prefix}/login`, login);
     server.use(`${prefix}/register`, register);
+    server.use(`${prefix}/todo`, todo);
     server.use(`${prefix}/address`, authService.authentication(authHeaderKey), address);
     server.use(`${prefix}/user`, authService.authentication(authHeaderKey), user);
     server.use(`${prefix}/cart`, authService.authentication(authHeaderKey), cart);
