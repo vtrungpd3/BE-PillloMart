@@ -64,5 +64,19 @@ controller.updateById = async (req, res) => {
     }
 };
 
+controller.getById = async (req, res) => {
+    try {
+        const result = await Todo.findById(req.params.id);
+
+        if (!result._id) {
+            return errorCommonResponse(res, 'Get by id failed');
+        }
+
+        successResponse(res, result);
+    } catch (exception) {
+        errorCommonResponse(res, exception);
+    }
+};
+
 module.exports = controller;
 
